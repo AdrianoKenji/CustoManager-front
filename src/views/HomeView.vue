@@ -28,12 +28,13 @@ export default {
     const methods = reactive({
       getOlaMundo() {
         axios
-          .get("http://localhost:8081/api/users/get")
+          .get("https://api-customanager.herokuapp.com/api/hello")
           .then((response) => {
             message.value = response.data;
           })
           .catch((e) => {
             console.log(e);
+            message.value = "Ocorreu um erro ao conectar com a API"
           });
       },
     });
