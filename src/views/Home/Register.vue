@@ -172,7 +172,7 @@ export default {
 
         if (objectUser.password === confirmPassword) {
           axios
-            .post("http://localhost:8081/api/users/register", objectUser)
+            .post("https://api-customanager.herokuapp.com/api/users/register", objectUser)
             .then(() => {
               message.value = "Cadastro feito com sucesso.";
             })

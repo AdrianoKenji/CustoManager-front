@@ -344,7 +344,7 @@ export default {
     const methods = reactive({
       getAllUser() {
         axios
-          .get("http://localhost:8081/api/users/get-all-users")
+          .get("https://api-customanager.herokuapp.com/api/users/get-all-users")
           .then((response) => {
             users.value = response.data;
           })
