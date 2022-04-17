@@ -13,25 +13,7 @@
           </router-link>
         </div>
 
-        <div class="col-6 row mt-3">
-          <div class="col-4">
-            <router-link to="/" style="text-decoration: none">
-              <span class="text-white">Início</span>
-            </router-link>
-          </div>
-
-          <div class="col-4">
-            <router-link to="/" style="text-decoration: none">
-              <span class="text-white">Sobre nós</span>
-            </router-link>
-          </div>
-
-          <div class="col-4">
-            <router-link to="/" style="text-decoration: none">
-              <span class="text-white">Serviços</span>
-            </router-link>
-          </div>
-        </div>
+        <div class="col-6"></div>
 
         <div class="col-3 row text-end">
           <div class="col-6"></div>

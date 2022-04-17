@@ -125,26 +125,26 @@
         Visualizar
       </button>
     </h4>
-
-    <table class="table mt-2" v-if="users.length > 0">
-      <thead>
-        <th>Id</th>
-        <th>Nome</th>
-        <th>Email</th>
-        <th>Cpf</th>
-        <th>Telefone</th>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.cpf }}</td>
-          <td>{{ user.telephone }}</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
+
+  <Table
+    :ArrayData="users"
+    :Header="header"
+    :isList="true"
+    :title="'Listagem de Usuário'"
+    :loading="loading"
+    @edit="edit($event)"
+    @remove="remove($event)"
+  />
+
+  <!--  <Table
+    :data="users"
+    :isBlock="true"
+    :title="'Listagem de Usuário'"
+    :profileImage="true"
+    @edit="edit($event)"
+    @remove="remove($event)"
+  /> -->
 
   <!-- <div class="row featurette mt-5">
     <div class="col-7">
@@ -332,30 +332,99 @@
 </template>
 
 <script>
-const axios = require("axios");
+import Table from "@/components/Table/Table.vue";
 
 import { reactive, ref, toRefs } from "@vue/reactivity";
+import UserService from "@/services/UserService";
+
+//Bootstrap and jQuery libraries
+import "bootstrap/dist/css/bootstrap.min.css";
+import "jquery/dist/jquery.min.js";
+//Datatable Modules
+import "datatables.net-dt/js/dataTables.dataTables";
+import "datatables.net-dt/css/jquery.dataTables.min.css";
 
 export default {
   name: "Home",
+  components: {
+    Table,
+  },
   setup() {
     const users = ref([]);
 
+    const header = ref([
+      {
+        name: "Id",
+      },
+      {
+        name: "Nome",
+      },
+      {
+        name: "CPF",
+      },
+      {
+        name: "Email",
+      },
+      {
+        name: "Telefone",
+      },
+      {
+        name: "Endereço",
+      },
+      {
+        name: "Status",
+      },
+      {
+        name: "Ações",
+      },
+    ]);
+
+    const loading = ref(false);
+
     const methods = reactive({
       getAllUser() {
-        axios
-          .get("https://api-customanager.herokuapp.com/api/users/get-all-users")
+        loading.value = true;
+        UserService.getAllUser()
           .then((response) => {
-            users.value = response.data;
+            methods.organizeTable(response.data);
+            loading.value = false;
           })
           .catch((e) => {
             console.log(e);
+          })
+          .finally(() => {
+            loading.value = false;
           });
+      },
+
+      organizeTable(response) {
+        users.value = [];
+        response.map((x) => {
+          users.value.push({
+            id: x.id,
+            nome: x.nome,
+            cpf: x.cpf,
+            email: x.email,
+            telefone: x.telefone,
+            endereco: x.endereco,
+            status: x.status,
+          });
+        });
+      },
+
+      remove(event) {
+        console.log(event);
+      },
+
+      edit(event) {
+        console.log(event);
       },
     });
 
     return {
       users,
+      header,
+      loading,
       ...toRefs(methods),
     };
   },

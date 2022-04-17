@@ -1,18 +1,17 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router/router.js'
-import '@popperjs/core'
-import 'bootstrap'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import router from './router.js'
+import VMask from "vue-the-mask"
+
 import 'bootstrap/dist/js/bootstrap.min.js'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import 'jquery/dist/jquery.min.js';
 import 'jquery'
-
-import { VueMaskDirective } from "v-mask";
-
 window.jQuery = window.$ = require('jquery')
+
 createApp(App)
     .use(router)
-    .directive("mask", VueMaskDirective)
+    .use(VMask)
     .mount('#app')
 
