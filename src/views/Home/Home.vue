@@ -118,33 +118,63 @@
     </button>
   </div> -->
 
-  <div class="col-12 mt-4">
-    <h4>
-      Listagem de Usuários (Demonstração do Banco)
-      <button class="btn-sm btn-primary" @click="getAllUser()">
-        Visualizar
-      </button>
-    </h4>
+  <div class="mt-4">
+    <div class="d-flex justify-content-evenly">
+      <div class="col-4">
+        <div class="text-start">
+          <h5>CustoManager</h5>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card bg-dark">
+          <div class="">
+            <h4 class="text-white mt-4">Faça seu Login</h4>
+
+            <div class="row d-flex justify-content-center mt-4">
+              <div class="col-10 mb-4">
+                <div class="input-group input-group-lg">
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="Email"
+                  />
+                </div>
+              </div>
+              <div class="col-10 mb-4">
+                <div class="input-group input-group-lg">
+                  <input
+                    type="password"
+                    class="form-control"
+                    placeholder="Senha"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-12">
+                <button class="col-10 btn btn-lg btn-primary">
+                  <span class="fs-6 text-white">Continuar</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-12">
+                <button class="btn btn-link" @click="openModalResetPassword()">
+                  Esqueci minha senha >
+                </button>
+              </div>
+
+              <div class="col-12">
+                <button class="btn btn-link">Me cadastrar ></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <Table
-    :ArrayData="users"
-    :Header="header"
-    :isList="true"
-    :title="'Listagem de Usuário'"
-    :loading="loading"
-    @edit="edit($event)"
-    @remove="remove($event)"
-  />
-
-  <!--  <Table
-    :data="users"
-    :isBlock="true"
-    :title="'Listagem de Usuário'"
-    :profileImage="true"
-    @edit="edit($event)"
-    @remove="remove($event)"
-  /> -->
 
   <!-- <div class="row featurette mt-5">
     <div class="col-7">
@@ -329,18 +359,23 @@
       </div>
     </div>
   </div> -->
+
+  <ModalResetPassword />
 </template>
 
 <script>
 import Table from "@/components/Table/Table.vue";
 
+import ModalResetPassword from "./Modal/ModalResetPassword.vue";
+
 import { reactive, ref, toRefs } from "@vue/reactivity";
 import UserService from "@/services/UserService";
 
-//Bootstrap and jQuery libraries
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "jquery/dist/jquery.min.js";
-//Datatable Modules
+
 import "datatables.net-dt/js/dataTables.dataTables";
 import "datatables.net-dt/css/jquery.dataTables.min.css";
 
@@ -348,6 +383,7 @@ export default {
   name: "Home",
   components: {
     Table,
+    ModalResetPassword,
   },
   setup() {
     const users = ref([]);
@@ -382,6 +418,18 @@ export default {
     const loading = ref(false);
 
     const methods = reactive({
+      openModalResetPassword() {
+        var modal = new bootstrap.Modal(
+          document.getElementById("modalResetPassword"),
+          {
+            keyboard: false,
+            backdrop: "static",
+          }
+        );
+        var modalToggle = document.getElementById("modalResetPassword");
+        modal.show(modalToggle);
+      },
+
       getAllUser() {
         loading.value = true;
         UserService.getAllUser()

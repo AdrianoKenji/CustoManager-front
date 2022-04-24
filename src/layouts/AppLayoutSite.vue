@@ -1,11 +1,10 @@
 <template>
-  <div class="">
-    <div class="col-12">
-      <HeaderLayout />
-    </div>
-    <div class="col-12" style="min-height: 83vh">
-      <slot />
-    </div>
+  <div>
+    <HeaderLayout />
+  </div>
+  
+  <div style="min-height: 83vh">
+    <slot />
   </div>
 </template>
 <script>
@@ -19,7 +18,9 @@ export default {
   name: "AppLayoutSite",
   setup() {
     const mode = ref("site");
+
     provide("mode", mode);
+
     return {
       mode,
     };

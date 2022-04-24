@@ -13,9 +13,9 @@ const routes = [
   },
 
   {
-    path: '/entrar',
-    name: 'Login',
-    component: () => import(/* webpackChunkName: "about" */ '@/views/Home/Login.vue'),
+    path: '/esqueci-a-senha',
+    name: 'ResetPassword',
+    component: () => import('@/views/Home/ResetPassword.vue'),
     meta: {
       layout: 'AppLayoutSite'
     },

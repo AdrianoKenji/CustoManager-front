@@ -6,6 +6,8 @@ import VMask from "vue-the-mask"
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import 'boxicons';
+
 import 'jquery/dist/jquery.min.js';
 import 'jquery'
 window.jQuery = window.$ = require('jquery')

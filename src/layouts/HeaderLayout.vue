@@ -16,7 +16,7 @@ export default {
   name: "HeaderLayout",
   setup() {
     const mode = inject("mode", null);
-    console.log(mode.value);
+
     return {
       mode,
     };
