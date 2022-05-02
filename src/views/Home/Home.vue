@@ -119,13 +119,45 @@
   </div> -->
 
   <div class="mt-4">
-    <div class="d-flex justify-content-evenly">
-      <div class="col-4">
+    <div class="row d-flex justify-content-evenly">
+      <div class="col-lg-4 col-md-5 ms-2 me-2 col-sm-10">
         <div class="text-start">
-          <h5>CustoManager</h5>
+          <div class="row mt-4">
+            <div class="col-6">
+              <span class="fw-bold">Gerenciamento</span>
+              <br />
+              <span
+                >Capacidade de operacionar um sistema, com controle dos
+                estoques, financeiro e funcionários.</span
+              >
+            </div>
+            <div class="col-6">
+              <img
+                src="@/assets/img/undraw_operating_system.svg"
+                alt="Operação de sistemas"
+                style="height: 200; width: 250px"
+              />
+            </div>
+
+            <div class="col-6 mt-4">
+              <img
+                src="@/assets/img/undraw_advanced_customization.svg"
+                alt="Customização avançada"
+                style="height: 200px; width: 200px"
+              />
+            </div>
+            <div class="col-6 mt-4">
+              <span class="fw-bold">Customização</span>
+              <br />
+              <span
+                >Personalização com o intuito de cada usuário se sentir único em
+                relação ao seu sistema.</span
+              >
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col-4">
+      <div class="col-lg-4 col-md-5 col-sm-10 mt-2 ms-2 me-2 mb-3">
         <div class="card bg-dark">
           <div class="">
             <h4 class="text-white mt-4">Faça seu Login</h4>
@@ -135,8 +167,10 @@
                 <div class="input-group input-group-lg">
                   <input
                     type="email"
-                    class="form-control"
+                    class="form-control fs-5"
                     placeholder="Email"
+                    maxlength="50"
+                    v-model="email"
                   />
                 </div>
               </div>
@@ -144,8 +178,10 @@
                 <div class="input-group input-group-lg">
                   <input
                     type="password"
-                    class="form-control"
+                    class="form-control fs-5"
                     placeholder="Senha"
+                    maxlength="50"
+                    v-model="password"
                   />
                 </div>
               </div>
@@ -153,7 +189,7 @@
 
             <div class="row mb-4">
               <div class="col-12">
-                <button class="col-10 btn btn-lg btn-primary">
+                <button class="col-10 btn btn-lg btn-primary" @click="login()">
                   <span class="fs-6 text-white">Continuar</span>
                 </button>
               </div>
@@ -167,7 +203,9 @@
               </div>
 
               <div class="col-12">
-                <button class="btn btn-link">Me cadastrar ></button>
+                <router-link to="/cadastrar">
+                  <button class="btn btn-link">Me cadastrar ></button>
+                </router-link>
               </div>
             </div>
           </div>
@@ -360,62 +398,46 @@
     </div>
   </div> -->
 
+  <ModalMessage
+    :title="modalMessage.title"
+    :isError="modalMessage.isError"
+    :message="modalMessage.message"
+    :reference="modalMessage.reference"
+  />
+
   <ModalResetPassword />
 </template>
 
 <script>
-import Table from "@/components/Table/Table.vue";
-
 import ModalResetPassword from "./Modal/ModalResetPassword.vue";
+import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
 import { reactive, ref, toRefs } from "@vue/reactivity";
-import UserService from "@/services/UserService";
+
+import AuthService from "@/services/AuthService";
 
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "jquery/dist/jquery.min.js";
-
-import "datatables.net-dt/js/dataTables.dataTables";
-import "datatables.net-dt/css/jquery.dataTables.min.css";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Home",
   components: {
-    Table,
     ModalResetPassword,
+    ModalMessage,
   },
   setup() {
-    const users = ref([]);
+    const route = useRouter();
 
-    const header = ref([
-      {
-        name: "Id",
-      },
-      {
-        name: "Nome",
-      },
-      {
-        name: "CPF",
-      },
-      {
-        name: "Email",
-      },
-      {
-        name: "Telefone",
-      },
-      {
-        name: "Endereço",
-      },
-      {
-        name: "Status",
-      },
-      {
-        name: "Ações",
-      },
-    ]);
+    const email = ref("");
+    const password = ref("");
 
-    const loading = ref(false);
+    const modalMessage = ref({
+      title: "",
+      isError: false,
+      message: "",
+      reference: "Home",
+    });
 
     const methods = reactive({
       openModalResetPassword() {
@@ -430,49 +452,55 @@ export default {
         modal.show(modalToggle);
       },
 
-      getAllUser() {
-        loading.value = true;
-        UserService.getAllUser()
+      openModalMessage(title, isError, message) {
+        modalMessage.value.title = title;
+        modalMessage.value.isError = isError;
+        modalMessage.value.message = message;
+
+        var modal = new bootstrap.Modal(
+          document.getElementById(
+            "modalMessage" + modalMessage.value.reference
+          ),
+          {
+            keyboard: false,
+            backdrop: "static",
+          }
+        );
+        var modalToggle = document.getElementById(
+          "modalMessage" + modalMessage.value.reference
+        );
+        modal.show(modalToggle);
+      },
+
+      login() {
+        let obj = {
+          login: email.value,
+          senha: password.value,
+        };
+        AuthService.login(obj)
           .then((response) => {
-            methods.organizeTable(response.data);
-            loading.value = false;
+            console.log(response.data);
+            localStorage.setItem("token", response.data.token);
+            route.push("/dashboard");
           })
           .catch((e) => {
-            console.log(e);
-          })
-          .finally(() => {
-            loading.value = false;
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao logar.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem);
           });
-      },
-
-      organizeTable(response) {
-        users.value = [];
-        response.map((x) => {
-          users.value.push({
-            id: x.id,
-            nome: x.nome,
-            cpf: x.cpf,
-            email: x.email,
-            telefone: x.telefone,
-            endereco: x.endereco,
-            status: x.status,
-          });
-        });
-      },
-
-      remove(event) {
-        console.log(event);
-      },
-
-      edit(event) {
-        console.log(event);
       },
     });
 
     return {
-      users,
-      header,
-      loading,
+      route,
+      email,
+      password,
+      modalMessage,
       ...toRefs(methods),
     };
   },
@@ -480,4 +508,7 @@ export default {
 </script>
 
 <style scoped>
+div {
+  overflow-x: hidden;
+}
 </style>

@@ -1,35 +1,37 @@
 <template v-if="row != {}">
   <template v-for="(info, index) in Object.values(row)" :key="index">
-    
     <td v-if="info === true">
-      <span class="badge bg-success">Ativo</span>
+      <i class="bx bx-check fs-3 text-success"></i>
     </td>
     <td v-else-if="info === false">
-      <span class="badge bg-secondary">Inativo</span>
+      <i class="bx bx-x fs-3 text-danger"></i>
     </td>
 
-    <td v-else>{{ info }}</td>
+    <td v-else class="text-center">{{ info }}</td>
   </template>
 
-  <td>
-    <button
-      v-if="editButton"
-      type="button"
-      class="btn btn-warning btn-sm h-75 mt-2 me-2"
-      @click="edit(row.id)"
-    >
-      <img src="@/assets/icons/edit-2.svg" alt="Editar" />
-    </button>
-
-    <button
-      v-if="removeButton"
-      type="button"
-      class="btn btn-danger btn-sm h-75 mt-2 me-2"
-      @click="edit(row.id)"
-    >
-      <img src="@/assets/icons/trash-2.svg" alt="Excluir" />
-    </button>
-  </td>
+  <div>
+    <td>
+      <button
+        v-if="editButton"
+        type="button"
+        class="btn btn-warning btn-sm h-75 me-1"
+        @click="edit(row)"
+      >
+        <img src="@/assets/icons/edit-2.svg" alt="Editar" />
+      </button>
+    </td>
+    <td>
+      <button
+        v-if="removeButton"
+        type="button"
+        class="btn btn-danger btn-sm h-75 me-1"
+        @click="edit(row)"
+      >
+        <img src="@/assets/icons/trash-2.svg" alt="Excluir" />
+      </button>
+    </td>
+  </div>
 </template>
 
 <script>

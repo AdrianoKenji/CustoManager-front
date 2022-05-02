@@ -1,19 +1,17 @@
 <template>
-  <div class="col-12 mt-3">
+  <!--  <div class="col-12 mt-3">
     <h4 class="text-start ms-3">{{ title }}</h4>
     <hr class="col-3 ms-3 text-primary" style="margin-top: -6px; height: 2px" />
-  </div>
+  </div> -->
 
-  <div class="d-flex justify-content-center">
-    <div class="col-10" v-if="isList">
-      <List
-        :datas="ArrayData"
-        :columns="Header"
-        :loading="loading"
-        @edit="edit($event)"
-        @remove="remove($event)"
-      />
-    </div>
+  <div v-if="isList" class="d-flex justify-content-center">
+    <List
+      :datas="ArrayData"
+      :columns="Header"
+      :loading="loading"
+      @edit="edit($event)"
+      @remove="remove($event)"
+    />
   </div>
 
   <div class="d-flex justify-content-center">
@@ -55,10 +53,10 @@ export default {
       type: Boolean,
       required: false,
     },
-    title: {
+    /*     title: {
       type: String,
       required: true,
-    },
+    }, */
     loading: {
       type: Boolean,
       required: false,
@@ -71,7 +69,7 @@ export default {
     },
     Header: {
       type: Array,
-      required: false,
+      required: true,
       default: [],
     },
   },

@@ -2,16 +2,16 @@
   <div>
     <HeaderSite v-if="mode == 'site'" />
 
-    <HeaderDash v-if="mode == 'dash'" />
+    <AsideDashboard v-if="mode == 'dash'" />
   </div>
 </template>
 <script>
 import { inject } from "@vue/runtime-core";
 import HeaderSite from "../components/HeaderSite.vue";
-import HeaderDash from "../components/HeaderDash.vue";
+import AsideDashboard from "../components/AsideDashboard.vue";
 
 export default {
-  components: { HeaderSite, HeaderDash },
+  components: { HeaderSite, AsideDashboard },
 
   name: "HeaderLayout",
   setup() {

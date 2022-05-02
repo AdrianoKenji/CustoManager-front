@@ -2,11 +2,12 @@
   <div>
     <HeaderLayout />
   </div>
-  
-  <div style="min-height: 83vh">
+
+  <div style="min-height: 60vh">
     <slot />
   </div>
 </template>
+
 <script>
 import { ref } from "@vue/reactivity";
 import { provide } from "@vue/runtime-core";

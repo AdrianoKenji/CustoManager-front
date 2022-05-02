@@ -1,47 +1,50 @@
 <template>
-  <table
-    class="table table-hover table-bordered dt-responsive nowrap"
-    id="tabela"
-  >
-    <thead class="bg bg-primary mt-1">
-      <tr>
-        <th v-for="(column, index) in columns" :key="index">
-          {{ column.name }}
-        </th>
-      </tr>
-    </thead>
-    <tbody v-if="datas.length > 0">
-      <tr v-for="(data, index) in datas" :key="index">
-        <Row
-          :row="data"
-          :editButton="true"
-          :removeButton="true"
-          @edit="edit($event)"
-          @remove="remove($event)"
-        />
-      </tr>
-    </tbody>
-    <tbody v-else>
-      <tr>
-        <td colspan="8">
-          <div class="row">
-            <div class="col-12 mt-2 mb-2" v-if="loading">
-              <div
-                class="spinner-border"
-                style="width: 3rem; height: 3rem"
-                role="status"
-              >
-                <span class="visually-hidden">Loading...</span>
+  <div style="max-width: 80%; overflow-y: hidden; overflow-x: visible">
+    <table class="table table-hover" id="tabela">
+      <thead class="bg bg-primary mt-1">
+        <tr>
+          <th
+            v-for="(column, index) in columns"
+            :key="index"
+            class="text-center"
+          >
+            {{ column.name }}
+          </th>
+        </tr>
+      </thead>
+      <tbody v-if="datas.length > 0">
+        <tr v-for="(data, index) in datas" :key="index">
+          <Row
+            :row="data"
+            :editButton="true"
+            :removeButton="true"
+            @edit="edit($event)"
+            @remove="remove($event)"
+          />
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td :colspan="columns.length + 1">
+            <div class="row">
+              <div class="col-12 mt-2 mb-2" v-if="loading">
+                <div
+                  class="spinner-border"
+                  style="width: 3rem; height: 3rem"
+                  role="status"
+                >
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+              <div v-else class="col-12">
+                <h4 class="fw-bold mt-3 mb-3">Não há dados</h4>
               </div>
             </div>
-            <div v-else class="col-12">
-              <h4 class="fw-bold mt-3 mb-3">Não há dados</h4>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -49,12 +52,6 @@ import Row from "@/components/Table/Types/ListComponents/Row.vue";
 
 import { reactive, toRefs } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
-
-import "bootstrap/dist/css/bootstrap.min.css";
-import "jquery/dist/jquery.min.js";
-
-import "datatables.net-dt/js/dataTables.dataTables";
-import "datatables.net-dt/css/jquery.dataTables.min.css";
 
 export default {
   name: "List",
