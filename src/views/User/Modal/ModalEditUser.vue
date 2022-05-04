@@ -165,6 +165,7 @@
     :isError="modalMessage.isError"
     :message="modalMessage.message"
     :reference="modalMessage.reference"
+    :needsRefresh="modalMessage.needsRefresh"
   />
 </template>
 
@@ -191,13 +192,15 @@ export default {
       isError: false,
       message: "",
       reference: "ModalEditUser",
+      needsRefresh: false,
     });
 
     const methods = reactive({
-      openModalMessage(title, isError, message) {
+      openModalMessage(title, isError, message, needsRefresh) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
         modalMessage.value.message = message;
+        modalMessage.value.needsRefresh = needsRefresh;
 
         var modal = new bootstrap.Modal(
           document.getElementById(
@@ -227,7 +230,7 @@ export default {
               mensagem = "Ocorreu um erro ao buscar o usuário.";
             }
 
-            methods.openModalMessage("Erro", true, mensagem);
+            methods.openModalMessage("Erro", true, mensagem, true);
           });
       },
 

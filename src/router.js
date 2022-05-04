@@ -53,6 +53,7 @@ const routes = [
     }
   },
 
+  // Dashboard
   {
     path: '/dashboard',
     name: 'Dashboard',
@@ -65,10 +66,35 @@ const routes = [
     }
   },
 
+  // Usuários
   {
     path: '/usuarios',
     name: 'UserList',
     component: () => import('@/views/User/UserList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterAdminPage(next)
+    }
+  },
+
+  // Empresas
+  {
+    path: '/empresas',
+    name: 'CompanyList',
+    component: () => import('@/views/Company/CompanyList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterAdminPage(next)
+    }
+  },
+  {
+    path: '/criar-empresa',
+    name: 'AddCompany',
+    component: () => import('@/views/Company/AddCompany.vue'),
     meta: {
       layout: 'AppLayoutDashboard'
     },

@@ -8,8 +8,28 @@ class UserService {
         return baseURL.post(urlBase + "/register", user)
     }
 
-    getAllUser() {
-        return baseURL.get(urlBase + "/get-all", {
+    getAllUser(orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
+        console.log(orderBy)
+        console.log(orderAsc)
+        console.log(offset)
+        console.log(limit)
+        return baseURL.get(urlBase + "/get-all" +
+            '?orderBy=' + orderBy +
+            '&orderAsc=' + orderAsc +
+            '&pageNumber=' + offset +
+            '&pageSize=' + limit, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
+    search(filters, orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
+        return baseURL.post(urlBase + "/search" +
+            '?orderBy=' + orderBy +
+            '&orderAsc=' + orderAsc +
+            '&pageNumber=' + offset +
+            '&pageSize=' + limit, filters, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }
@@ -33,7 +53,7 @@ class UserService {
     }
 
     deleteUser(id) {
-        return baseURL.get(urlBase + "/delete/" + id, {
+        return baseURL.delete(urlBase + "/delete/" + id, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

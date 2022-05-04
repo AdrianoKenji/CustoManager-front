@@ -7,7 +7,7 @@
       <i class="bx bx-x fs-3 text-danger"></i>
     </td>
 
-    <td v-else class="text-center">{{ info }}</td>
+    <td v-else class="text-start">{{ info }}</td>
   </template>
 
   <div>
@@ -26,7 +26,7 @@
         v-if="removeButton"
         type="button"
         class="btn btn-danger btn-sm h-75 me-1"
-        @click="edit(row)"
+        @click="remove(row)"
       >
         <img src="@/assets/icons/trash-2.svg" alt="Excluir" />
       </button>

@@ -1,87 +1,98 @@
 <template>
-  <!--  <div class="col-12 mt-3">
-    <h4 class="text-start ms-3">{{ title }}</h4>
-    <hr class="col-3 ms-3 text-primary" style="margin-top: -6px; height: 2px" />
-  </div> -->
-
-  <div v-if="isList" class="d-flex justify-content-center">
+  <div v-if="isList" class="row">
+    <Filter :columns="Header" @search="search($event)" @clean="clean()" />
     <List
       :datas="ArrayData"
       :columns="Header"
       :loading="loading"
       @edit="edit($event)"
       @remove="remove($event)"
+      @ordenation="ordenation($event)"
     />
-  </div>
-
-  <div class="d-flex justify-content-center">
-    <div class="col-10" v-if="isBlock">
-      <template v-for="(block, index) in data" :key="index">
-        <Block
-          :block="block"
-          :profileImage="profileImage"
-          @edit="edit($event)"
-          @remove="remove($event)"
-        />
-      </template>
-    </div>
+    <Pagination
+      v-if="ArrayData.length"
+      :offset="offset"
+      :limit="limit"
+      :total="total"
+      @changePage="changePage($event)"
+    />
   </div>
 </template>
 
 <script>
+import Filter from "@/components/Table/Types/ListComponents/Filter.vue";
 import List from "@/components/Table/Types/List.vue";
-import Block from "@/components/Table/Types/Block.vue";
+import Pagination from "@/components/Table/Types/ListComponents/Pagination.vue";
 
 import { reactive, toRefs } from "@vue/reactivity";
 
 export default {
   name: "Table",
   components: {
+    Filter,
     List,
-    Block,
+    Pagination,
   },
   props: {
-    ArrayData: {
-      type: Array,
-      required: true,
-    },
     isList: {
       type: Boolean,
       required: false,
-    },
-    isBlock: {
-      type: Boolean,
-      required: false,
-    },
-    /*     title: {
-      type: String,
-      required: true,
-    }, */
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    profileImage: {
-      type: Boolean,
-      required: false,
-      default: false,
     },
     Header: {
       type: Array,
       required: true,
       default: [],
     },
+    ArrayData: {
+      type: Array,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    offset: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    limit: {
+      type: Number,
+      required: true,
+      default: 5,
+    },
+    total: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
-  emits: ["remove", "edit"],
+  emits: ["search", "clean", "ordenation", "edit", "remove", "changePage"],
   setup(props, { emit }) {
     const methods = reactive({
+      search(event) {
+        emit("search", event);
+      },
+
+      clean() {
+        emit("clean");
+      },
+
       edit(event) {
         emit("edit", event);
       },
 
       remove(event) {
         emit("remove", event);
+      },
+
+      ordenation(event) {
+        emit("ordenation", event);
+      },
+
+      changePage(event) {
+        emit("changePage", event);
       },
     });
 

@@ -20,6 +20,13 @@
         </a>
         <span class="tooltip">Usuários</span>
       </li>
+      <li>
+        <a href="/empresas">
+          <i class='bx bx-buildings'></i>
+          <span class="links_name">Empresas</span>
+        </a>
+        <span class="tooltip">Empresas</span>
+      </li>
       <!-- <li>
         <a href="#">
           <i class="bx bx-chat"></i>

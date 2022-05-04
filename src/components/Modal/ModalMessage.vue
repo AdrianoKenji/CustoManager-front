@@ -40,6 +40,7 @@
             type="button"
             class="btn btn-secondary btn-sm h-75"
             data-bs-dismiss="modal"
+            @click="closeAction()"
           >
             Fechar
           </button>
@@ -50,6 +51,8 @@
 </template>
 
 <script>
+import { reactive, toRefs } from "@vue/reactivity";
+import { useRouter } from "vue-router";
 export default {
   name: "ModalMessage",
   props: {
@@ -73,7 +76,34 @@ export default {
       required: true,
       default: "",
     },
+    redirect: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    needsRefresh: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
-  setup() {},
+  setup(props, { emit }) {
+    const router = useRouter();
+
+    const methods = reactive({
+      closeAction() {
+        if (props.redirect) {
+          router.push(props.redirect);
+        } else if (props.needsRefresh) {
+          emit("closeAction");
+        }
+      },
+    });
+
+    return {
+      router,
+      ...toRefs(methods),
+    };
+  },
 };
 </script>
