@@ -325,11 +325,11 @@ export default {
   },
   setup() {
     const user = ref({
-      nome: "Adriano Kenji",
-      login: "adriano0608.kenji@gmail.com",
-      cpf: "497.301.468-02",
-      telefone: "13981144821",
-      endereco: "Rua Raja Atique 435",
+      nome: "",
+      login: "",
+      cpf: "",
+      telefone: "",
+      endereco: "",
       dataNascimento: "",
       senha: "",
     });
