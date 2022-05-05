@@ -47,8 +47,8 @@
           <tr v-for="(data, index) in datas" :key="index">
             <Row
               :row="data"
-              :editButton="true"
-              :removeButton="true"
+              :editButton="editButton"
+              :removeButton="removeButton"
               @edit="edit($event)"
               @remove="remove($event)"
             />
@@ -100,6 +100,16 @@ export default {
       default: [],
     },
     loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    editButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    removeButton: {
       type: Boolean,
       required: false,
       default: false,

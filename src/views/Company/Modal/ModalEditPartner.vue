@@ -1,9 +1,9 @@
 <template>
   <div
     class="modal fade"
-    id="modalEditUser"
+    id="modalEditPartner"
     tabindex="-1"
-    aria-labelledby="modalEditUserLabel"
+    aria-labelledby="modalEditPartnerLabel"
     aria-hidden="true"
   >
     <div
@@ -13,8 +13,8 @@
     >
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="modalEditUserLabel">
-            Editar usuário - {{ selectedUser.Nome }}
+          <h4 class="modal-title" id="modalEditPartnerLabel">
+            Editar associado - {{ selectedPartner.Nome }}
           </h4>
           <button
             type="button"
@@ -24,7 +24,7 @@
           ></button>
         </div>
         <div class="modal-body">
-          <div class="text-start">
+          <!-- <div class="text-start">
             <h5>Dados pessoais</h5>
             <hr class="col-4" style="height: 3px; margin-top: -5px" />
           </div>
@@ -138,7 +138,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="modal-footer text-end">
           <button
@@ -178,20 +178,20 @@ import ModalMessage from "@/components/Modal/ModalMessage.vue";
 import UserService from "@/services/UserService";
 
 export default {
-  name: "ModalEditUser",
+  name: "ModalEditPartner",
   components: {
     ModalMessage,
   },
   setup() {
-    const selectedUser = inject("selectedUser", {});
+    const selectedPartner = inject("selectedPartner", {});
 
-    const user = ref({});
+    const partner = ref({});
 
     const modalMessage = ref({
       title: "",
       isError: false,
       message: "",
-      reference: "ModalEditUser",
+      reference: "ModalEditPartner",
       needsRefresh: false,
     });
 
@@ -217,8 +217,8 @@ export default {
         modal.show(modalToggle);
       },
 
-      getUserById() {
-        UserService.getUserById(selectedUser.value.Id)
+      getPartnerBy() {
+        UserService.getUserById(selectedPartner.value.Id)
           .then((response) => {
             user.value = response.data;
           })
@@ -241,7 +241,7 @@ export default {
               "Sucesso",
               false,
               "O usuário " +
-                selectedUser.value.Nome +
+                selectedPartner.value.Nome +
                 " foi atualizado com sucesso."
             );
           })
@@ -252,7 +252,7 @@ export default {
             } else {
               mensagem =
                 "Ocorreu um erro ao atualizar o usuário " +
-                selectedUser.value.Nome +
+                selectedPartner.value.Nome +
                 ".";
             }
 
@@ -262,7 +262,7 @@ export default {
     });
 
     watch(
-      () => selectedUser.value.Id,
+      () => selectedPartner.value.Id,
       (newValue, oldValue) => {
         if (newValue != oldValue) {
           methods.getUserById();
@@ -271,8 +271,8 @@ export default {
     );
 
     return {
-      selectedUser,
-      user,
+      selectedPartner,
+      partner,
       modalMessage,
       ...toRefs(methods),
     };

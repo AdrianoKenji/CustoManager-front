@@ -9,10 +9,6 @@ class UserService {
     }
 
     getAllUser(orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
-        console.log(orderBy)
-        console.log(orderAsc)
-        console.log(offset)
-        console.log(limit)
         return baseURL.get(urlBase + "/get-all" +
             '?orderBy=' + orderBy +
             '&orderAsc=' + orderAsc +
@@ -44,8 +40,16 @@ class UserService {
         })
     }
 
-    updateUser(usuario) {
-        return baseURL.put(urlBase + "/update", usuario, {
+    getUserByCPF(cpf) {
+        return baseURL.get(urlBase + "/get-by-cpf?cpf=" + cpf, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
+    updateUser(user) {
+        return baseURL.put(urlBase + "/update", user, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

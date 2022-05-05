@@ -1,16 +1,23 @@
 <template>
   <div v-if="isList" class="row">
-    <Filter :columns="Header" @search="search($event)" @clean="clean()" />
+    <Filter
+      v-if="hasFilter"
+      :columns="Header"
+      @search="search($event)"
+      @clean="clean()"
+    />
     <List
       :datas="ArrayData"
       :columns="Header"
       :loading="loading"
+      :editButton="editButton"
+      :removeButton="removeButton"
       @edit="edit($event)"
       @remove="remove($event)"
       @ordenation="ordenation($event)"
     />
     <Pagination
-      v-if="ArrayData.length"
+      v-if="ArrayData.length && hasPagination"
       :offset="offset"
       :limit="limit"
       :total="total"
@@ -54,18 +61,38 @@ export default {
     },
     offset: {
       type: Number,
-      required: true,
+      required: false,
       default: 0,
     },
     limit: {
       type: Number,
-      required: true,
+      required: false,
       default: 5,
     },
     total: {
       type: Number,
-      required: true,
+      required: false,
       default: 0,
+    },
+    hasFilter: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    hasPagination: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    editButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    removeButton: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   emits: ["search", "clean", "ordenation", "edit", "remove", "changePage"],

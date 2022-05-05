@@ -102,6 +102,17 @@ const routes = [
       validatePerm.canEnterPage(next)
     }
   },
+  {
+    path: '/editar-empresa/:id',
+    name: 'CompanyEdit',
+    component: () => import('@/views/Company/CompanyEdit.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
 ]
 
 const router = createRouter({
