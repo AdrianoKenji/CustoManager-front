@@ -254,7 +254,8 @@ export default {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "A empresa " + event.Nome + " foi deletada."
+              "A empresa " + event.Nome + " foi deletada.",
+              true
             );
           })
           .catch((e) => {

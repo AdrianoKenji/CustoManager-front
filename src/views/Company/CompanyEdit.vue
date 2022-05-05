@@ -662,6 +662,7 @@ export default {
           },
           usuarioFuncionario: {
             id: user.value.id,
+            login: user.value.login
           },
         };
 

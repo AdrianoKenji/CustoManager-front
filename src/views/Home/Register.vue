@@ -332,6 +332,7 @@ export default {
       endereco: "",
       dataNascimento: "",
       senha: "",
+      admin: true
     });
 
     const confirmPassword = ref("");
