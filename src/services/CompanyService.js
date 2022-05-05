@@ -1,8 +1,6 @@
 import baseURL from "@/api"
 
 var urlBase = "/empresas"
-var urlVinculoBase = "/vinculos"
-var urlAssociadosBase = "/associados"
 
 class CompanyService {
     registerCompany(obj) {
@@ -55,22 +53,6 @@ class CompanyService {
 
     deleteCompany(id) {
         return baseURL.delete(urlBase + "/delete/" + id, {
-            headers: {
-                'Authorization': localStorage.getItem('token')
-            }
-        })
-    }
-
-    insertEmployerInCompany(obj) {
-        return baseURL.post(urlVinculoBase + "/criar-vinculo", obj, {
-            headers: {
-                'Authorization': localStorage.getItem('token')
-            }
-        })
-    }
-
-    insertPartnerInCompany(obj) {
-        return baseURL.post(urlAssociadosBase + "/register", obj, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

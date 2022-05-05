@@ -92,6 +92,8 @@ export default {
   setup() {
     const route = useRouter();
 
+    const token = ref({});
+
     const sidebar = ref(".sidebar");
     const closeBtn = ref("#btn");
     const searchBtn = ref(".bx-search");
@@ -133,6 +135,7 @@ export default {
 
     return {
       route,
+      token,
       sidebar,
       closeBtn,
       searchBtn,

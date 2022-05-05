@@ -14,7 +14,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="modalEditPartnerLabel">
-            Editar associado - {{ selectedPartner.Nome }}
+            Editar associado - {{ selectedPartner.nome }}
           </h4>
           <button
             type="button"
@@ -24,8 +24,8 @@
           ></button>
         </div>
         <div class="modal-body">
-          <!-- <div class="text-start">
-            <h5>Dados pessoais</h5>
+          <div class="text-start">
+            <h5>Dados da {{ selectedPartner.tipoAssociado }}</h5>
             <hr class="col-4" style="height: 3px; margin-top: -5px" />
           </div>
           <div class="row mt-2 mb-2">
@@ -36,49 +36,56 @@
                   class="form-control"
                   id="floatingInputNome"
                   placeholder="Nome"
-                  v-model="user.nome"
+                  v-model="selectedPartner.nome"
                   required
                 />
                 <label for="floatingInputNome" class="ps-3 ms-1">Nome</label>
               </div>
 
-              <div class="form-floating col-8 mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="floatingInputEmail"
-                  placeholder="Email"
-                  v-model="user.login"
-                  required
-                />
-                <label for="floatingInputEmail" class="ps-3 ms-1">Email</label>
-              </div>
-
-              <div class="form-floating col-4 mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="floatingInputCPF"
-                  v-mask="'###.###.###-##'"
-                  placeholder="CPF"
-                  v-model="user.cpf"
-                  required
-                />
-                <label for="floatingInputCPF" class="ps-3 ms-1">CPF</label>
-              </div>
-
-              <div class="form-floating col-4 mb-3">
-                <input
-                  type="date"
-                  class="form-control"
-                  id="floatingInputDataNascimento"
-                  placeholder="Data de Nascimento"
-                  v-model="user.dataNascimento"
-                  required
-                />
-                <label for="floatingInputDataNascimento" class="ps-3 ms-1"
-                  >Data de Nascimento</label
+              <div class="form-floating col-3 mb-3">
+                <select
+                  class="form-select"
+                  v-model="selectedPartner.tipoPessoa"
+                  @change="partner.documento = ''"
                 >
+                  <option value="" selected disabled>Selecione:</option>
+                  <!--  <option v-for="(partner, index) in partners" :key="index" :value="partner">
+                    {{ partner}}
+                  </option> -->
+                  <option value="PESSOA_FISICA">Física</option>
+                  <option value="PESSOA_JURIDICA">Jurídica</option>
+                </select>
+                <label class="ps-3 ms-1">Tipo de pessoa</label>
+              </div>
+
+              <div class="form-floating col-5 mb-3">
+                <input
+                  v-if="selectedPartner.tipoPessoa == 'PESSOA_FISICA'"
+                  type="text"
+                  class="form-control"
+                  id="floatingInputCPFAndCNPJ"
+                  v-mask="'###.###.###-##'"
+                  placeholder="CPF/CNPJ"
+                  v-model="selectedPartner.documento"
+                  required
+                />
+                <input
+                  v-else-if="selectedPartner.tipoPessoa == 'PESSOA_JURIDICA'"
+                  type="text"
+                  class="form-control"
+                  id="floatingInputCPFAndCNPJ"
+                  v-mask="'##.###.###/####-##'"
+                  placeholder="CPF/CNPJ"
+                  v-model="selectedPartner.documento"
+                  required
+                />
+                <label for="floatingInputCPFAndCNPJ" class="ps-3 ms-1">
+                  {{
+                    selectedPartner.tipoPessoa == "PESSOA_FISICA"
+                      ? "CPF"
+                      : "CNPJ"
+                  }}
+                </label>
               </div>
 
               <div class="form-floating col-4 mb-3">
@@ -87,7 +94,8 @@
                   class="form-control"
                   id="floatingInputTelefone"
                   placeholder="Telefone"
-                  v-model="user.telefone"
+                  v-mask="'(##) #####-####'"
+                  v-model="selectedPartner.telefone"
                   required
                 />
                 <label for="floatingInputTelefone" class="ps-3 ms-1"
@@ -101,44 +109,15 @@
                   class="form-control"
                   id="floatingInputEndereco"
                   placeholder="Endereço"
-                  v-model="user.endereco"
+                  v-model="selectedPartner.endereco"
                   required
                 />
                 <label for="floatingInputEndereco" class="ps-3 ms-1"
                   >Endereço</label
                 >
               </div>
-              <div class="col-4">
-                <div class="form-check form-switch col-12">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="flexSwitchCheckAcessoAoSistema"
-                    v-model="user.acessoAoSistema"
-                  />
-                  <label
-                    class="form-check-label"
-                    for="flexSwitchCheckAcessoAoSistema"
-                    >Acesso ao sistema</label
-                  >
-                </div>
-
-                <div class="form-check form-switch col-12">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="flexSwitchCheckAcessoAoSistema"
-                    v-model="user.admin"
-                  />
-                  <label
-                    class="form-check-label"
-                    for="flexSwitchCheckAcessoAoSistema"
-                    >Administrador</label
-                  >
-                </div>
-              </div>
             </div>
-          </div> -->
+          </div>
         </div>
         <div class="modal-footer text-end">
           <button
@@ -151,7 +130,7 @@
           <button
             type="button"
             class="btn btn-success btn-sm h-75"
-            @click="updateUser()"
+            @click="updatePartner()"
           >
             Salvar
           </button>
@@ -175,7 +154,8 @@ import { inject, reactive, ref, toRefs, watch } from "@vue/runtime-core";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
-import UserService from "@/services/UserService";
+
+import PartnerService from "@/services/PartnerService";
 
 export default {
   name: "ModalEditPartner",
@@ -183,6 +163,8 @@ export default {
     ModalMessage,
   },
   setup() {
+    const idCompany = inject("idCompany");
+
     const selectedPartner = inject("selectedPartner", {});
 
     const partner = ref({});
@@ -217,31 +199,35 @@ export default {
         modal.show(modalToggle);
       },
 
-      getPartnerBy() {
-        UserService.getUserById(selectedPartner.value.Id)
+      getPartnerById() {
+        console.log(selectedPartner.value);
+        PartnerService.getPartnerById(selectedPartner.value.id)
           .then((response) => {
-            user.value = response.data;
+            console.log(response.data);
+            partner.value = response.data;
           })
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 401) {
               mensagem = e.response.data.errors[0];
             } else {
-              mensagem = "Ocorreu um erro ao buscar o usuário.";
+              mensagem = "Ocorreu um erro ao buscar o associado.";
             }
 
             methods.openModalMessage("Erro", true, mensagem, true);
           });
       },
 
-      updateUser() {
-        UserService.updateUser(user.value)
+      updatePartner() {
+        partner.value.idEmpresa = idCompany.value;
+        console.log(partner.value);
+        PartnerService.updatePartner(partner.value)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "O usuário " +
-                selectedPartner.value.Nome +
+              "O associado " +
+                selectedPartner.value.nome +
                 " foi atualizado com sucesso."
             );
           })
@@ -251,8 +237,8 @@ export default {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem =
-                "Ocorreu um erro ao atualizar o usuário " +
-                selectedPartner.value.Nome +
+                "Ocorreu um erro ao atualizar o associado " +
+                selectedPartner.value.nome +
                 ".";
             }
 
@@ -262,15 +248,16 @@ export default {
     });
 
     watch(
-      () => selectedPartner.value.Id,
+      () => selectedPartner.value.id,
       (newValue, oldValue) => {
         if (newValue != oldValue) {
-          methods.getUserById();
+          methods.getPartnerById();
         }
       }
     );
 
     return {
+      idCompany,
       selectedPartner,
       partner,
       modalMessage,

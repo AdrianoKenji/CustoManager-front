@@ -166,6 +166,7 @@
     :message="modalMessage.message"
     :reference="modalMessage.reference"
     :needsRefresh="modalMessage.needsRefresh"
+    @closeAction="closeAction()"
   />
 </template>
 
@@ -182,7 +183,8 @@ export default {
   components: {
     ModalMessage,
   },
-  setup() {
+  emits: ["closeAction"],
+  setup(props, { emit }) {
     const selectedUser = inject("selectedUser", {});
 
     const user = ref({});
@@ -244,10 +246,11 @@ export default {
                 selectedUser.value.Nome +
                 " foi atualizado com sucesso."
             );
+            methods.closeAction();
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem =
@@ -258,6 +261,10 @@ export default {
 
             methods.openModalMessage("Erro", true, mensagem);
           });
+      },
+
+      closeAction() {
+        emit("closeAction");
       },
     });
 
