@@ -4,8 +4,22 @@
       <h3>Editar empresa - {{ company.nome }}</h3>
       <hr class="col-10" style="height: 3px; margin-top: -5px" />
     </div>
-    <div class="col-5 text-end" @click="updateCompany()">
-      <button class="btn btn-success">Salvar</button>
+    <div class="ms-5 row col-5 text-end">
+      <div class="col-9">
+        <button class="btn btn-success" @click="updateCompany()">
+          <i class="bx bx-save fs-5 mt-1"></i>
+          <span class="ms-2">Salvar</span>
+        </button>
+      </div>
+
+      <div class="col-3">
+        <router-link :to="'/empresa/produtos/' + router.params.id">
+          <button class="btn btn-dark">
+            <i class="bx bx-plus fs-5 mt-1"></i>
+            <span>Produto</span>
+          </button>
+        </router-link>
+      </div>
     </div>
   </div>
 
@@ -72,7 +86,7 @@
     </div>
   </div>
 
-  <div class="text-start ms-3 mt-5 mb-3">
+  <div class="text-start ms-3 mt-4 mb-4">
     <div class="row">
       <div class="col-1 me-5">
         <h5>Funcionários</h5>
@@ -662,7 +676,7 @@ export default {
           },
           usuarioFuncionario: {
             id: user.value.id,
-            login: user.value.login
+            login: user.value.login,
           },
         };
 

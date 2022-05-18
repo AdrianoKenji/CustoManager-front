@@ -23,6 +23,14 @@ class CompanyService {
         })
     }
 
+    getCompaniesByUserId(id) {
+        return baseURL.get(urlBase + "/get-empresas-by-usuario/" + id, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
     search(filters, orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
         return baseURL.post(urlBase + "/search" +
             '?orderBy=' + orderBy +
