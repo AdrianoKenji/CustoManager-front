@@ -7,7 +7,7 @@
     <button
       v-for="(page, index) in pages"
       :key="page"
-      class="btn btn-sm btn-dark ms-1 me-1"
+      class="btn btn-sm btn-dark ms-1 me-1 mt-2"
       :class="{ currentPage: page === currentPage }"
       @click="changePage(index)"
     >

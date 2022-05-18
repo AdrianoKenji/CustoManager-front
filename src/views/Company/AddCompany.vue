@@ -130,9 +130,20 @@ export default {
         modal.show(modalToggle);
       },
 
-      insertCompany() {
-        console.log(company.value);
-        CompanyService.registerCompany(company.value)
+      insertCompany(idUsuario) {
+        let obj = {
+          associado: [],
+          cnpj: company.value.cnpj,
+          endereco: company.value.endereco,
+          idUsuarioCriador: idUsuario,
+          nome: company.value.nome,
+          telefone: company.value.telefone,
+          vinculos: [],
+        };
+
+        console.log(obj);
+
+        CompanyService.registerCompany(obj)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
@@ -142,7 +153,7 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.message;
             } else {
               mensagem = "Ocorreu um erro ao cadastrar Empresa.";
@@ -156,21 +167,8 @@ export default {
         let token = TokenUtils.getTokenAndDecodeToJson(
           localStorage.getItem("token")
         );
-        UserService.getUserById(token.id)
-          .then((response) => {
-            company.value.usuario = response.data;
-            methods.insertCompany();
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.message;
-            } else {
-              mensagem = "Ocorreu um erro ao obter o Representante da Empresa.";
-            }
 
-            methods.openModalMessage("Erro", true, mensagem);
-          });
+        methods.insertCompany(token.id);
       },
     });
 

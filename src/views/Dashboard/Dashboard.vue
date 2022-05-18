@@ -6,9 +6,12 @@
         <hr class="col-12" style="height: 3px; margin-top: -5px" />
       </div>
     </div>
-    <div class="text-start">
+    <div class="d-flex justify-content-between">
       <div class="">
-        <span class="ms-1 fs-4">Bem vindo, {{ nome }}!</span>
+        <span class="fs-4">Bem vindo, {{ token.nome }}!</span>
+      </div>
+      <div class="">
+        <span class="fs-4 me-5">{{ messageDate }}</span>
       </div>
     </div>
   </div>
@@ -31,8 +34,6 @@ import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
 import TokenUtils from "@/utils/TokenUtils";
 
-import UserService from "@/services/UserService";
-
 export default {
   name: "Dashboard",
   components: {
@@ -42,6 +43,18 @@ export default {
     const nome = ref("");
 
     const token = ref({});
+
+    const days = ref([
+      "Domingo",
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado",
+    ]);
+
+    const messageDate = ref("");
 
     const modalMessage = ref({
       title: "",
@@ -71,21 +84,20 @@ export default {
         modal.show(modalToggle);
       },
 
-      getUserById(id) {
-        UserService.getUserById(id)
-          .then((response) => {
-            nome.value = response.data.nome;
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.errors[0];
-            } else {
-              mensagem = "Ocorreu um erro ao buscar o usuário.";
-            }
+      getDateAndHour() {
+        let date = new Date();
 
-            methods.openModalMessage("Erro", true, mensagem);
-          });
+        var dia = date.getDate();
+        var mes = date.getMonth();
+        var ano4 = date.getFullYear();
+        var hora = date.getHours();
+        var min = date.getMinutes();
+
+        var str_data = dia + "/" + (mes + 1) + "/" + ano4;
+        var str_hora = hora + ":" + min;
+
+        messageDate.value =
+          days.value[date.getDay()] + ", " + str_data + " às " + str_hora;
       },
     });
 
@@ -94,12 +106,14 @@ export default {
         localStorage.getItem("token")
       );
 
-      methods.getUserById(token.value.id);
+      methods.getDateAndHour();
     });
 
     return {
       nome,
       token,
+      days,
+      messageDate,
       modalMessage,
       ...toRefs(methods),
     };

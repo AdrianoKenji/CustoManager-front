@@ -4,8 +4,22 @@
       <h3>Editar empresa - {{ company.nome }}</h3>
       <hr class="col-10" style="height: 3px; margin-top: -5px" />
     </div>
-    <div class="col-5 text-end" @click="updateCompany()">
-      <button class="btn btn-success">Salvar</button>
+    <div class="ms-5 row col-5 text-end">
+      <div class="col-9">
+        <button class="btn btn-success" @click="updateCompany()">
+          <i class="bx bx-save fs-5 mt-1"></i>
+          <span class="ms-2">Salvar</span>
+        </button>
+      </div>
+
+      <div class="col-3">
+        <router-link :to="'/empresa/produtos/' + router.params.id">
+          <button class="btn btn-dark">
+            <i class="bx bx-plus fs-5 mt-1"></i>
+            <span>Produto</span>
+          </button>
+        </router-link>
+      </div>
     </div>
   </div>
 
@@ -16,6 +30,7 @@
       style="height: 3px; margin-top: -5px; opacity: 1"
     />
   </div>
+
   <div class="row mt-2 mb-2 d-flex justify-content-center">
     <div class="row col-11">
       <div class="form-floating col-6 mb-3">
@@ -71,7 +86,7 @@
     </div>
   </div>
 
-  <div class="text-start ms-3 mt-4 mb-3">
+  <div class="text-start ms-3 mt-4 mb-4">
     <div class="row">
       <div class="col-1 me-5">
         <h5>Funcionários</h5>
@@ -159,11 +174,11 @@
       :hasFilter="false"
       :hasPagination="false"
       :removeButton="true"
-      @remove="remove($event)"
+      @remove="removeEmployee($event)"
     />
   </div>
 
-  <div class="text-start ms-3 mt-4 mb-3">
+  <div class="text-start ms-3 mt-5 mb-3">
     <div class="row">
       <div class="col-1 me-5">
         <h5>Associados</h5>
@@ -318,8 +333,8 @@
       :hasPagination="false"
       :removeButton="true"
       :editButton="true"
-      @remove="removePartner($event)"
       @edit="editPartner($event)"
+      @remove="removePartner($event)"
     />
   </div>
 
@@ -346,6 +361,8 @@ import ModalMessage from "@/components/Modal/ModalMessage.vue";
 import ModalEditPartner from "./Modal/ModalEditPartner.vue";
 
 import CompanyService from "@/services/CompanyService";
+import EmployeeService from "@/services/EmployeeService";
+import PartnerService from "@/services/PartnerService";
 import UserService from "@/services/UserService";
 
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -360,6 +377,7 @@ export default {
   },
   setup() {
     const router = useRoute();
+    const idCompany = ref("");
 
     const token = ref({});
 
@@ -377,11 +395,39 @@ export default {
 
     const headerEmployees = ref([
       {
+        name: "Id",
+        key: "id",
+        value: false,
+        order: false,
+        hidden: true,
+      },
+      {
         id: 1,
         name: "Nome",
         key: "nome",
         value: false,
         order: false,
+      },
+      {
+        name: "IdEmpresaVinculo",
+        key: "idEmpresaVinculo",
+        value: false,
+        order: false,
+        hidden: true,
+      },
+      {
+        name: "usuarioCriador",
+        key: "usuarioCriador",
+        value: false,
+        order: false,
+        hidden: true,
+      },
+      {
+        name: "usuarioFuncionario",
+        key: "usuarioFuncionario",
+        value: false,
+        order: false,
+        hidden: true,
       },
       {
         id: 2,
@@ -450,6 +496,7 @@ export default {
         key: "id",
         value: false,
         order: false,
+        hidden: true,
       },
       {
         id: 2,
@@ -461,14 +508,14 @@ export default {
       {
         id: 3,
         name: "Tipo associado",
-        key: "tipo_associado",
+        key: "tipoAssociado",
         value: false,
         order: false,
       },
       {
         id: 4,
         name: "Tipo pessoa",
-        key: "tipo_pessoa",
+        key: "tipoPessoa",
         value: false,
         order: false,
       },
@@ -548,6 +595,7 @@ export default {
         CompanyService.getCompanyById(router.params.id)
           .then((response) => {
             company.value = response.data;
+
             methods.responseTableEmployer(company.value.vinculos);
             methods.responseTablePartner(company.value.associado);
           })
@@ -567,13 +615,21 @@ export default {
         company.value.vinculos = [];
         response.map((x) => {
           company.value.vinculos.push({
+            id: x.id,
             Nome: x.usuarioFuncionario.nome,
+            idEmpresaVinculo: router.params.id,
+            usuarioCriador: {
+              id: x.usuarioCriador.id,
+            },
+            usuarioFuncionario: {
+              id: x.usuarioFuncionario.id,
+            },
             CPF: x.usuarioFuncionario.cpf,
             Email: x.usuarioFuncionario.login,
             Telefone: x.usuarioFuncionario.telefone,
             Endereco: x.usuarioFuncionario.endereco,
-            AdminEmpresarial: x.adminEmpresarial,
-            Status: x.status,
+            adminEmpresarial: x.adminEmpresarial,
+            status: x.status,
           });
         });
       },
@@ -582,13 +638,13 @@ export default {
         company.value.associado = [];
         response.map((x) => {
           company.value.associado.push({
-              Id: x.id,
-            Nome: x.nome,
-            TipoAssociado: x.tipoAssociado,
-            TipoPessoa: x.tipoPessoa,
-            Documento: x.documento,
-            Telefone: x.telefone,
-            Endereco: x.endereco,
+            id: x.id,
+            nome: x.nome,
+            tipoAssociado: x.tipoAssociado,
+            tipoPessoa: x.tipoPessoa,
+            documento: x.documento,
+            telefone: x.telefone,
+            endereco: x.endereco,
           });
         });
       },
@@ -620,10 +676,11 @@ export default {
           },
           usuarioFuncionario: {
             id: user.value.id,
+            login: user.value.login,
           },
         };
 
-        CompanyService.insertEmployerInCompany(obj)
+        EmployeeService.insertEmployerInCompany(obj)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
@@ -654,7 +711,7 @@ export default {
           tipoAssociado: partner.value.tipo,
           tipoPessoa: partner.value.pessoa,
         };
-        CompanyService.insertPartnerInCompany(obj)
+        PartnerService.insertPartnerInCompany(obj)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
@@ -662,6 +719,13 @@ export default {
               "Associado cadastrado com sucesso.",
               true
             );
+
+            partner.value.tipo = "";
+            partner.value.pessoa = "";
+            partner.value.documento = "";
+            partner.value.nome = "";
+            partner.value.telefone = "";
+            partner.value.endereco = "";
           })
           .catch((e) => {
             let mensagem = "";
@@ -676,7 +740,19 @@ export default {
       },
 
       updateCompany() {
-        CompanyService.updateCompany(company.value)
+        let obj = {
+          associado: [],
+          cnpj: company.value.cnpj,
+          endereco: company.value.endereco,
+          id: company.value.id,
+          idUsuarioCriador: company.value.idUsuarioCriador,
+          nome: company.value.nome,
+          telefone: company.value.telefone,
+          vinculos: [],
+        };
+
+        console.log(company.value);
+        CompanyService.updateCompany(obj)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
@@ -711,9 +787,57 @@ export default {
         token.value = TokenUtils.getTokenAndDecodeToJson(tokenCoded);
       },
 
+      removeEmployee(event) {
+        console.log(event);
+        EmployeeService.deleteEmployee(event.id)
+          .then(() => {
+            methods.openModalMessage(
+              "Sucesso",
+              false,
+              "O funcionário " + event.Nome + " foi deletado.",
+              true
+            );
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.message;
+            } else {
+              mensagem =
+                "Ocorreu um erro ao deletar o funcionário " + event.Nome + ".";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
+      },
+
       editPartner(event) {
         selectedPartner.value = event;
         methods.openModalEditPartner();
+      },
+
+      removePartner(event) {
+        console.log(event);
+        PartnerService.deletePartner(event.id)
+          .then(() => {
+            methods.openModalMessage(
+              "Sucesso",
+              false,
+              "O associado foi deletado.",
+              true
+            );
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.message;
+            } else {
+              mensagem =
+                "Ocorreu um erro ao deletar o associado " + event.Nome + ".";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
       },
     });
 
@@ -748,14 +872,17 @@ export default {
     });
 
     provide("selectedPartner", selectedPartner);
+    provide("idCompany", idCompany);
 
     onMounted(() => {
+      idCompany.value = router.params.id;
       methods.getCompanyById();
       methods.getTokenToJson();
     });
 
     return {
       router,
+      idCompany,
       token,
       company,
       employerCPF,

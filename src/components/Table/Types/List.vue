@@ -4,49 +4,48 @@
       <table class="table table-hover">
         <thead class="bg bg-dark mt-1">
           <tr>
-            <th
-              v-for="(column, index) in columns"
-              :key="index"
-              class="text-center text-white"
-            >
-              <div class="d-flex justify-content-evenly">
-                <div class="col-10 text-truncate text-start ps-2">
-                  {{ column.name }}
-                </div>
-                <div
-                  class="col-2 list-group"
-                  v-if="column.order"
-                  style="margin-left: -10px"
-                >
-                  <button
-                    class="btn btn-sm bg-dark"
-                    style="margin-top: -10px; margin-bottom: -3px"
+            <template v-for="(column, index) in columns" :key="index">
+              <th class="text-center text-white" v-if="!column.hidden" style="max-width: 150px; min-width: 150px">
+                <div class="d-flex justify-content-evenly">
+                  <div class="col-10 text-truncate text-start ps-2">
+                    {{ column.name }}
+                  </div>
+                  <div
+                    class="col-2 list-group"
+                    v-if="column.order"
+                    style="margin-left: -10px"
                   >
-                    <i
-                      class="bx bxs-up-arrow text-white"
-                      style="font-size: 12px"
-                      @click="ordenation(column, 'ASC')"
-                    ></i>
-                  </button>
-                  <button
-                    class="btn btn-sm bg-dark"
-                    style="margin-top: -10px; margin-bottom: -10px"
-                  >
-                    <i
-                      class="bx bxs-down-arrow text-white"
-                      style="font-size: 12px"
-                      @click="ordenation(column, 'DESC')"
-                    ></i>
-                  </button>
+                    <button
+                      class="btn btn-sm bg-dark"
+                      style="margin-top: -10px; margin-bottom: -3px"
+                    >
+                      <i
+                        class="bx bxs-up-arrow text-white"
+                        style="font-size: 12px"
+                        @click="ordenation(column, 'ASC')"
+                      ></i>
+                    </button>
+                    <button
+                      class="btn btn-sm bg-dark"
+                      style="margin-top: -10px; margin-bottom: -10px"
+                    >
+                      <i
+                        class="bx bxs-down-arrow text-white"
+                        style="font-size: 12px"
+                        @click="ordenation(column, 'DESC')"
+                      ></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </th>
+              </th>
+            </template>
           </tr>
         </thead>
         <tbody v-if="datas.length > 0">
           <tr v-for="(data, index) in datas" :key="index">
             <Row
               :row="data"
+              :items="columns"
               :editButton="editButton"
               :removeButton="removeButton"
               @edit="edit($event)"

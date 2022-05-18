@@ -306,6 +306,8 @@
     :title="modalMessage.title"
     :isError="modalMessage.isError"
     :message="modalMessage.message"
+    :redirect="'/'"
+    :reference="modalMessage.reference"
   />
 </template>
 
@@ -325,11 +327,11 @@ export default {
   },
   setup() {
     const user = ref({
-      nome: "Adriano Kenji",
-      login: "adriano0608.kenji@gmail.com",
-      cpf: "497.301.468-02",
-      telefone: "13981144821",
-      endereco: "Rua Raja Atique 435",
+      nome: "",
+      login: "",
+      cpf: "",
+      telefone: "",
+      endereco: "",
       dataNascimento: "",
       senha: "",
     });
@@ -342,6 +344,7 @@ export default {
       title: "",
       isError: false,
       message: "",
+      reference: "Register",
     });
 
     const methods = reactive({
@@ -351,13 +354,17 @@ export default {
         modalMessage.value.message = message;
 
         var modal = new bootstrap.Modal(
-          document.getElementById("modalMessage"),
+          document.getElementById(
+            "modalMessage" + modalMessage.value.reference
+          ),
           {
             keyboard: false,
             backdrop: "static",
           }
         );
-        var modalToggle = document.getElementById("modalMessage");
+        var modalToggle = document.getElementById(
+          "modalMessage" + modalMessage.value.reference
+        );
         modal.show(modalToggle);
       },
 
@@ -431,7 +438,7 @@ export default {
         }
       }
 
-      if (cont == 6) {
+      if (cont == 6 || step.value == 2) {
         canNextStep = true;
       }
 

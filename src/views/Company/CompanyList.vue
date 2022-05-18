@@ -58,6 +58,7 @@ import CompanyService from "@/services/CompanyService";
 
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { useRouter } from "vue-router";
+import TokenUtils from "@/utils/TokenUtils";
 
 export default {
   name: "CompanyList",
@@ -67,6 +68,8 @@ export default {
   },
   setup() {
     const router = useRouter();
+
+    const token = ref({});
 
     const companies = ref([]);
 
@@ -141,6 +144,12 @@ export default {
     });
 
     const methods = reactive({
+      getTokenAndDecode() {
+        token.value = TokenUtils.getTokenAndDecodeToJson(
+          localStorage.getItem("token")
+        );
+      },
+
       openModalMessage(title, isError, message, needsRefresh) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
@@ -160,6 +169,23 @@ export default {
           "modalMessage" + modalMessage.value.reference
         );
         modal.show(modalToggle);
+      },
+
+      getCompaniesByUserId() {
+        CompanyService.getCompaniesByUserId(token.value.id)
+          .then(() => {
+            companies.value = response.data;
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 400) {
+              mensagem = e.response.data.message;
+            } else {
+              mensagem = "Ocorreu um erro ao fazer as Listagens.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
       },
 
       search(event) {
@@ -254,7 +280,8 @@ export default {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "A empresa " + event.Nome + " foi deletada."
+              "A empresa " + event.Nome + " foi deletada.",
+              true
             );
           })
           .catch((e) => {
@@ -316,11 +343,18 @@ export default {
     });
 
     onMounted(() => {
-      methods.getAllCompanies();
+      methods.getTokenAndDecode();
+
+      if (token.value.admin) {
+        methods.getAllCompanies();
+      } else {
+        methods.getCompaniesByUserId();
+      }
     });
 
     return {
       router,
+      token,
       companies,
       header,
       offset,

@@ -66,6 +66,19 @@ const routes = [
     }
   },
 
+  // Meu perfil
+  {
+    path: '/meu-perfil',
+    name: 'MyProfile',
+    component: () => import('@/views/User/MyProfile.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+
   // Usuários
   {
     path: '/usuarios',
@@ -88,7 +101,7 @@ const routes = [
       layout: 'AppLayoutDashboard'
     },
     beforeEnter: (to, from, next) => {
-      validatePerm.canEnterAdminPage(next)
+      validatePerm.canEnterPage(next)
     }
   },
   {
@@ -112,6 +125,27 @@ const routes = [
     beforeEnter: (to, from, next) => {
       validatePerm.canEnterPage(next)
     }
+  },
+
+  {
+    path: '/empresa/produtos/:id',
+    name: 'ProductList',
+    component: () => import('@/views/Product/ProductList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+
+  {
+    path: '/nao-tenho-acesso',
+    name: 'Forbidden',
+    component: () => import('@/views/Error/Forbidden.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
   },
 ]
 

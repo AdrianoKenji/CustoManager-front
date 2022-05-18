@@ -13,7 +13,7 @@
         </a>
         <span class="tooltip">Dashboard</span>
       </li>
-      <li>
+      <li v-if="token.admin">
         <a href="/usuarios">
           <i class="bx bx-user"></i>
           <span class="links_name">Usuários</span>
@@ -22,7 +22,7 @@
       </li>
       <li>
         <a href="/empresas">
-          <i class='bx bx-buildings'></i>
+          <i class="bx bx-buildings"></i>
           <span class="links_name">Empresas</span>
         </a>
         <span class="tooltip">Empresas</span>
@@ -71,10 +71,12 @@
       </li> -->
       <li class="profile">
         <div class="profile-details">
-          <img src="" alt="profileImg" />
+          <img src="../assets/img/undraw_male_avatar.svg" alt="profileImg" />
           <div class="name_job">
-            <div class="name">Adriano Kenji</div>
-            <div class="job">Full Stack Developer</div>
+            <router-link to="/meu-perfil" class="router">
+              <div class="name">{{ token.nome }}</div>
+              <!-- <div class="job">Full Stack Developer</div> -->
+            </router-link>
           </div>
         </div>
         <i class="bx bx-log-out" id="log_out" @click="logout()"></i>
@@ -86,17 +88,27 @@
 <script>
 import { reactive, ref, toRefs } from "@vue/reactivity";
 import { useRouter } from "vue-router";
+import { onMounted } from "@vue/runtime-core";
+import TokenUtils from "@/utils/TokenUtils";
 
 export default {
   name: "HeaderDash",
   setup() {
     const route = useRouter();
 
+    const token = ref({});
+
     const sidebar = ref(".sidebar");
     const closeBtn = ref("#btn");
     const searchBtn = ref(".bx-search");
 
     const methods = reactive({
+      getTokenAndDecode() {
+        token.value = TokenUtils.getTokenAndDecodeToJson(
+          localStorage.getItem("token")
+        );
+      },
+
       close() {
         let sidebar = document.querySelector(".sidebar");
 
@@ -131,8 +143,14 @@ export default {
       },
     });
 
+    onMounted(() => {
+      methods.getTokenAndDecode();
+      console.log(token.value);
+    });
+
     return {
       route,
+      token,
       sidebar,
       closeBtn,
       searchBtn,

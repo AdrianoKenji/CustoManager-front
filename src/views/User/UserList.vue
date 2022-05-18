@@ -28,7 +28,7 @@
     />
   </div>
 
-  <ModalEditUser />
+  <ModalEditUser @closeAction="closeAction()" />
 
   <ModalMessage
     :title="modalMessage.title"
@@ -188,8 +188,6 @@ export default {
 
         arrayFilters.filters.push(obj);
 
-        console.log(arrayFilters);
-
         UserService.search(
           arrayFilters,
           orderBy.value,
@@ -272,7 +270,8 @@ export default {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "O usuário " + event.Nome + " foi deletado."
+              "O usuário " + event.Nome + " foi deletado.",
+              true
             );
           })
           .catch((e) => {

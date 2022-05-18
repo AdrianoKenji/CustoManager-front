@@ -232,6 +232,7 @@
     font-weight: 400;
     color: #fff;
     white-space: nowrap;
+    background: #1d1b31;
 }
 
 .sidebar li.profile .job {

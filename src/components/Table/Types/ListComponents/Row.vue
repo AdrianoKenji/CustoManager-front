@@ -1,19 +1,20 @@
 <template v-if="row != {}">
   <template v-for="(info, index) in Object.values(row)" :key="index">
-    <td v-if="info === true">
-      <i class="bx bx-check fs-3 text-success"></i>
-    </td>
-    <td v-else-if="info === false">
-      <i class="bx bx-x fs-3 text-danger"></i>
-    </td>
+    <td v-if="items[index].hidden == false || items[index].hidden == undefined">
+      <template v-if="info === true">
+        <i class="bx bx-check fs-3 text-success"></i>
+      </template>
+      <template v-else-if="info === false">
+        <i class="bx bx-x fs-3 text-danger"></i>
+      </template>
 
-    <td v-else class="text-start">{{ info }}</td>
+      <template v-else class="text-start">{{ info }}</template>
+    </td>
   </template>
 
-  <div>
-    <td>
+  <div class="col-12">
+    <td class="mx-auto" v-if="editButton">
       <button
-        v-if="editButton"
         type="button"
         class="btn btn-warning btn-sm h-75 me-1"
         @click="edit(row)"
@@ -21,9 +22,8 @@
         <img src="@/assets/icons/edit-2.svg" alt="Editar" />
       </button>
     </td>
-    <td>
+    <td class="mx-auto" v-if="removeButton">
       <button
-        v-if="removeButton"
         type="button"
         class="btn btn-danger btn-sm h-75 me-1"
         @click="remove(row)"
@@ -43,12 +43,21 @@ export default {
     row: {
       type: Object,
       required: true,
-      default: {},
+      default() {
+        return {};
+      },
     },
     attribute: {
       type: String,
       required: false,
       default: "",
+    },
+    items: {
+      type: Array,
+      required: true,
+      default() {
+        return [];
+      },
     },
     editButton: {
       type: Boolean,
