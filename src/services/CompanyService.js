@@ -11,7 +11,7 @@ class CompanyService {
         })
     }
 
-    getAllCompanies(orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
+    getAllCompanies(orderBy = "id", orderAsc = false, offset = 0, limit = 0) {
         return baseURL.get(urlBase + "/get-all" +
             '?orderBy=' + orderBy +
             '&orderAsc=' + orderAsc +

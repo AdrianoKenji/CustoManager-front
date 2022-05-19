@@ -227,7 +227,11 @@ export default {
         orderBy.value = event.orderBy;
         orderAsc.value = event.orderAsc;
 
+        if (token.value.admin) {
         methods.getAllCompanies();
+        } else {
+        methods.getCompaniesByUserId();
+      }
       },
 
       getAllCompanies() {
