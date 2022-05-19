@@ -1,8 +1,12 @@
 <template>
   <div>
-    <!-- <button v-if="showPrevious" @click="changePage(currentPage - 1)">
+    <button
+      class="btn btn-sm btn-dark ms-1 me-1 mt-2"
+      v-if="showPrevious"
+      @click="changePage(currentPage, true)"
+    >
       &laquo;
-    </button> -->
+    </button>
 
     <button
       v-for="(page, index) in pages"
@@ -14,9 +18,13 @@
       {{ page }}
     </button>
 
-    <!--  <button v-if="showNext" @click="changePage(currentPage + 1)">
+    <button
+      class="btn btn-sm btn-dark ms-1 me-1 mt-2"
+      v-if="showNext"
+      @click="changePage(currentPage + 1)"
+    >
       &raquo;
-    </button> -->
+    </button>
   </div>
 </template>
 
@@ -66,7 +74,16 @@ export default {
     });
 
     const methods = reactive({
-      changePage(offset) {
+      changePage(offset, isSubtraction = false) {
+        console.log(offset);
+        console.log(isSubtraction);
+        if (isSubtraction) {
+          offset = offset - 1;
+        }
+        if (offset >= pages.value.length) {
+          offset = pages.value.length - 1;
+        }
+        console.log(offset)
         emit("changePage", offset);
       },
     });

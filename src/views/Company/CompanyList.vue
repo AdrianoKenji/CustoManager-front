@@ -298,6 +298,7 @@ export default {
       },
 
       changePage(event) {
+        console.log(event)
         offset.value = event;
         methods.getAllCompanies();
       },

@@ -1,7 +1,7 @@
 <template>
   <div class="text-start">
     <div class="col-12">
-      <h3>Criar empresa</h3>
+      <h3>Criar produto</h3>
       <hr class="col-4" style="height: 3px; margin-top: -5px" />
     </div>
   </div>
@@ -9,44 +9,41 @@
   <div class="row d-flex justify-content-center mt-4">
     <div class="row col-10">
       <div class="form-floating col-6 mb-4">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingInputCompanyName"
-          placeholder="Razão social"
-          v-model="company.nome"
-          required
-        />
-        <label for="floatingInputCompanyName" class="ps-3 ms-1"
-          >Razão social</label
-        >
+        <select class="form-select" v-model="product.company">
+          <option value="" selected disabled>Selecione:</option>
+          <template v-for="company in companies" :key="company.id">
+            <option v-if="company.id === true" :value="company">
+              {{ company.name }}
+            </option>
+          </template>
+        </select>
+        <label for="floatingInputCompanyName" class="ps-3 ms-1">Empresa</label>
       </div>
 
       <div class="form-floating col-6 mb-4">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingInputCNPJ"
-          v-mask="'##.###.###/####-##'"
-          placeholder="CNPJ"
-          v-model="company.cnpj"
-          required
-        />
-        <label for="floatingInputCNPJ" class="ps-3 ms-1">CNPJ</label>
+        <select class="form-select" v-model="product.brand">
+          <option value="" selected disabled>Selecione:</option>
+          <template v-for="brand in brands" :key="brand.id">
+            <option v-if="brand.id === true" :value="brand">
+              {{ brand.name }}
+            </option>
+          </template>
+        </select>
+        <label for="floatingInputCompanyName" class="ps-3 ms-1">Marca</label>
       </div>
     </div>
 
     <div class="row col-10">
       <div class="form-floating col-6 mb-4">
-        <input
-          type="text"
-          class="form-control"
-          id="floatingInputAddress"
-          placeholder="Endereço"
-          v-model="company.endereco"
-          required
-        />
-        <label for="floatingInputAddress" class="ps-3 ms-1">Endereço</label>
+        <select class="form-select" v-model="product.type">
+          <option value="" selected disabled>Selecione:</option>
+          <template v-for="type in types" :key="type.id">
+            <option v-if="type.id === true" :value="type">
+              {{ type.name }}
+            </option>
+          </template>
+        </select>
+        <label for="floatingInputCompanyName" class="ps-3 ms-1">Tipo</label>
       </div>
 
       <div class="form-floating col-6 mb-4">
@@ -54,12 +51,23 @@
           type="text"
           class="form-control"
           id="floatingInputTelephone"
-          v-mask="'## #####-####'"
-          placeholder="Telefone"
-          v-model="company.telefone"
+          placeholder="Nome"
+          v-model="product.name"
           required
         />
-        <label for="floatingInputTelephone" class="ps-3 ms-1">Telefone</label>
+        <label for="floatingInputTelephone" class="ps-3 ms-1">Nome</label>
+      </div>
+
+      <div class="form-floating col-6 mb-4">
+        <input
+          type="text"
+          class="form-control"
+          id="floatingInputTelephone"
+          placeholder="Valor"
+          v-model="product.value"
+          required
+        />
+        <label for="floatingInputTelephone" class="ps-3 ms-1">Valor</label>
       </div>
     </div>
   </div>
@@ -73,7 +81,7 @@
     :isError="modalMessage.isError"
     :message="modalMessage.message"
     :reference="modalMessage.reference"
-    :redirect="'/empresas'"
+    :redirect="'/produtos'"
   />
 </template>
 
@@ -88,24 +96,28 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import TokenUtils from "@/utils/TokenUtils";
 
 export default {
-  name: "AddCompany",
+  name: "AddProduct",
   components: {
     ModalMessage,
   },
   setup() {
-    const company = ref({
-      nome: "",
-      cnpj: "",
-      endereco: "",
-      telefone: "",
-      usuario: {},
+    const product = ref({
+      company: "",
+      brand: "",
+      type: "",
+      name: "",
+      value: "",
     });
+
+    const companies = ref([]);
+    const brands = ref([]);
+    const types = ref([]);
 
     const modalMessage = ref({
       title: "",
       isError: false,
       message: "",
-      reference: "AddCompany",
+      reference: "AddProduct",
     });
 
     const methods = reactive({
@@ -172,7 +184,10 @@ export default {
     });
 
     return {
-      company,
+      product,
+      companies,
+      brands,
+      types,
       modalMessage,
       ...toRefs(methods),
     };

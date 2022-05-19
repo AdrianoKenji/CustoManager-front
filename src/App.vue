@@ -27,8 +27,4 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
-
-#back {
-  background-color: rgb(230, 230, 230);
-}
 </style>

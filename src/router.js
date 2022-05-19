@@ -128,9 +128,20 @@ const routes = [
   },
 
   {
-    path: '/empresa/produtos/:id',
+    path: '/produtos',
     name: 'ProductList',
     component: () => import('@/views/Product/ProductList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+  {
+    path: '/criar-produto',
+    name: 'AddProduct',
+    component: () => import('@/views/Product/AddProduct.vue'),
     meta: {
       layout: 'AppLayoutDashboard'
     },

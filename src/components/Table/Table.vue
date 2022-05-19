@@ -119,6 +119,7 @@ export default {
       },
 
       changePage(event) {
+        console.log(event);
         emit("changePage", event);
       },
     });

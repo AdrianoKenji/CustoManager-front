@@ -27,6 +27,13 @@
         </a>
         <span class="tooltip">Empresas</span>
       </li>
+      <li>
+        <a href="/produtos">
+          <i class='bx bxs-shopping-bags'></i>
+          <span class="links_name">Produtos</span>
+        </a>
+        <span class="tooltip">Produtos</span>
+      </li>
       <!-- <li>
         <a href="#">
           <i class="bx bx-chat"></i>

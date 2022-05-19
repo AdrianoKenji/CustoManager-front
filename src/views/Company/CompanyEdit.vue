@@ -5,20 +5,11 @@
       <hr class="col-10" style="height: 3px; margin-top: -5px" />
     </div>
     <div class="ms-5 row col-5 text-end">
-      <div class="col-9">
+      <div class="col-12">
         <button class="btn btn-success" @click="updateCompany()">
           <i class="bx bx-save fs-5 mt-1"></i>
           <span class="ms-2">Salvar</span>
         </button>
-      </div>
-
-      <div class="col-3">
-        <router-link :to="'/empresa/produtos/' + router.params.id">
-          <button class="btn btn-dark">
-            <i class="bx bx-plus fs-5 mt-1"></i>
-            <span>Produto</span>
-          </button>
-        </router-link>
       </div>
     </div>
   </div>
