@@ -23,7 +23,7 @@
             class="btn btn-dark btn-lg rounded-circle"
             @click="getProductsByCompanyId()"
           >
-            <i class="bx bx-plus fs-4 mt-2"></i>
+            <i class="bx bx-search fs-4 mt-2"></i>
           </button>
       </div>
 

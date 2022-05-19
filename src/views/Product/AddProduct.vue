@@ -288,7 +288,8 @@ export default {
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              console.log(e.response.data.message)
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao cadastrar produto.";
             }
