@@ -1,38 +1,62 @@
 <template>
-  <div class="text-start">
-    <div class="col-12">
-      <h3>Criar produto</h3>
-      <hr class="col-4" style="height: 3px; margin-top: -5px" />
-    </div>
+  <div class="col-6 text-start">
+      <h3>Editar produto - {{ product.nome }}</h3>
+      <hr class="col-10" style="height: 3px; margin-top: -5px" />
+  </div>
+
+
+  <div class="text-start ms-3 mt-4">
+    <h5>Dados cadastrados</h5>
+    <hr
+      class="col-2 bg-secondary"
+      style="height: 3px; margin-top: -5px; opacity: 1"
+    />
   </div>
 
   <div class="row d-flex justify-content-center mt-4">
+
+
     <div class="row col-10">
-      <div class="form-floating col-4 mb-4 float-start">
-        <select name="companies" class="form-select" v-model="selectedCompany">
-          <option value="" selected disabled>Selecione:</option>
-          <template v-for="company in companies" :key="company.id">
-            <option :value="company.id">
-              {{ company.nome }}
-            </option>
-          </template>
-        </select>
+
+      <div class="form-floating col-6 mb-4 float-start">
+       <input
+          type="text"
+          class="form-control"
+          id="floatingInputEmpresa"
+          disabled
+          placeholder="Valor"
+          v-model="product.nomeEmpresa"
+          required
+        />
         <label for="floatingInputCompanyName" class="ps-3 ms-1">Empresa</label>
       </div>
 
-      <div class="col-4 float-end">
-        <button
-          class="btn btn-dark btn-lg rounded-circle"
-          @click="getMarcaByCompanyId(), getTipoByCompanyId()"
+      <div class="form-check-lg form-switch col-2 mt-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheck"
+          v-model="product.ativo"
+        />
+        <label
+          class="form-check-label ms-2"
+          for="flexSwitchCheck"
+          >Ativo</label
         >
-          <i class="bx bx-search fs-4 mt-2"></i>
+      </div>
+       
+      <div class="col-4 float-end">
+          <button class="btn btn-success" @click="updateProduct()">
+          <i class="bx bx-save fs-5 mt-1"></i>
+          <span class="ms-2">Salvar</span>
         </button>
       </div>
+
     </div>
 
     <div class="row col-10">
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" v-model="selectedType">
+        <select class="form-select" v-model="product.tipoProduto">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="type in types" :key="type.id">
             <option :value="type">
@@ -40,11 +64,11 @@
             </option>
           </template>
         </select>
-        <label for="floatingInputCompanyName" class="ps-3 ms-1">Tipo</label>
-      </div>
+        <label for="floatingInputTipo" class="ps-3 ms-1">Tipo</label>
+      </div>      
 
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" v-model="selectedBrand">
+        <select class="form-select" v-model="product.marcaProduto">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="brand in brands" :key="brand.id">
             <option :value="brand">
@@ -52,7 +76,7 @@
             </option>
           </template>
         </select>
-        <label for="floatingInputCompanyName" class="ps-3 ms-1">Marca</label>
+        <label for="floatingInputMarca" class="ps-3 ms-1">Marca</label>
       </div>
 
       <div class="form-floating col-6 mb-4">
@@ -61,7 +85,7 @@
           class="form-control"
           id="floatingInputTelephone"
           placeholder="Nome"
-          v-model="product.name"
+          v-model="product.nome"
           required
         />
         <label for="floatingInputTelephone" class="ps-3 ms-1">Nome</label>
@@ -74,16 +98,12 @@
           class="form-control"
           id="floatingInputTelephone"
           placeholder="Valor"
-          v-model="product.value"
+          v-model="product.valor_unitario"
           required
         />
         <label for="floatingInputTelephone" class="ps-3 ms-1">Valor</label>
       </div>
     </div>
-  </div>
-
-  <div class="text-end col-11">
-    <button class="btn btn-success me-2" @click="insertProduto()">Criar</button>
   </div>
 
   <ModalMessage
@@ -99,64 +119,78 @@
 import { reactive, ref, toRefs } from "@vue/reactivity";
 import { onMounted, provide } from "@vue/runtime-core";
 
-import ModalMessage from "@/components/Modal/ModalMessage.vue";
+import { routerViewLocationKey, useRoute } from "vue-router";
 
-import CompanyService from "@/services/CompanyService";
+import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import TokenUtils from "@/utils/TokenUtils";
-import ProductService from "@/services/ProductService";
-import MarcaProdutoService from "@/services/MarcaProdutoService";
-import TipoProdutoService from "@/services/ProductTypeService";
+import ProductService from '@/services/ProductService';
+import MarcaProdutoService from '@/services/MarcaProdutoService';
+import TipoProdutoService from '@/services/TipoProdutoService';
 
 export default {
-  name: "AddProduct",
+  name: "EditProduct",
   components: {
     ModalMessage,
   },
   setup() {
-    const product = ref({
-      company: "",
-      brand: "",
-      type: "",
-      name: "",
-      value: "",
-    });
 
-    const companies = ref([]);
-
-    const company = ref([]);
-
-    const brands = ref([]);
-    const types = ref([]);
-
+    const router = useRoute();
+    
+    const product = ref({});
     const token = ref({});
 
     const loading = ref(false);
 
-    const selectedCompany = ref(0);
+    const brands = ref([]);
+    const types = ref([]);
+
     const selectedBrand = ref(0);
     const selectedType = ref(0);
 
-    const offsetCompany = ref(0);
-    const limitCompany = ref(9999);
-    const total = ref(0);
-    const orderByCompany = ref("id");
-    const orderAscCompany = ref(false);
+    const empresaId = ref(0);
+
+    const productBrand = ref(0);
+    const productType = ref(0);
+    
 
     const modalMessage = ref({
       title: "",
       isError: false,
       message: "",
-      reference: "AddProduct",
+      reference: "EditProduct",
     });
 
     const methods = reactive({
+
       getTokenAndDecode() {
         token.value = TokenUtils.getTokenAndDecodeToJson(
           localStorage.getItem("token")
         );
       },
+
+      getProductById() {
+        ProductService.getProductById(router.params.id)
+          .then((response) => {
+            product.value = response.data; 
+
+            methods.getMarcaByCompanyId(product.value.idEmpresa);
+            methods.getTipoByCompanyId(product.value.idEmpresa);
+
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao buscar o produto.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem);
+          });
+      },
+
 
       openModalMessage(title, isError, message) {
         modalMessage.value.title = title;
@@ -178,28 +212,11 @@ export default {
         modal.show(modalToggle);
       },
 
-      getCompaniesByUserId() {
-        CompanyService.getCompaniesByUserId(token.value.id)
-          .then((response) => {
-            console.log(response.data);
-            companies.value = response.data;
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 400) {
-              mensagem = e.response.data.message;
-            } else {
-              mensagem = "Ocorreu um erro ao obter as empresas.";
-            }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
-          });
-      },
-
-      getMarcaByCompanyId() {
-        MarcaProdutoService.getMarcaByCompanyId(selectedCompany.value)
+      getMarcaByCompanyId(idEmpresa) {         
+         MarcaProdutoService.getMarcaByCompanyId(idEmpresa)
           .then((response) => {
             brands.value = response.data.content;
+            console.log(brands.value)
           })
           .catch((e) => {
             console.log(e);
@@ -214,12 +231,13 @@ export default {
           });
       },
 
-      getTipoByCompanyId() {
-        TipoProdutoService.getTipoByCompanyId(selectedCompany.value)
+      getTipoByCompanyId(idEmpresa) {         
+         TipoProdutoService.getTipoByCompanyId(idEmpresa)
           .then((response) => {
             types.value = response.data.content;
+            console.log(types.value)
           })
-          .catch((e) => {
+          .catch((e) => {      
             let mensagem = "";
             if (e.response.status == 400) {
               mensagem = e.response.data.message;
@@ -231,93 +249,72 @@ export default {
           });
       },
 
-      getAllCompanies() {
-        loading.value = true;
-        CompanyService.getAllCompanies(
-          orderByCompany.value,
-          orderAscCompany.value,
-          offsetCompany.value,
-          limitCompany.value
-        )
-          .then((response) => {
-            console.log(response.data.content);
-            companies.value = response.data.content;
-          })
-          .catch((e) => {
-            console.log(e);
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.message;
-            } else {
-              mensagem = "Ocorreu um erro ao fazer as Listagens";
-            }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
-          })
-          .finally(() => {
-            loading.value = false;
-          });
-      },
-
-      insertProduto() {
+     updateProduct() {
         let obj = {
-          idEmpresa: selectedCompany.value,
-          idMarca: selectedBrand.value.id,
-          idTipo: selectedType.value.id,
-          nome: product.value.name,
-          valor_unitario: product.value.value,
+          id: product.value.id,
+          idEmpresa: product.value.idEmpresa,
+          idMarca: product.value.marcaProduto.id,
+          idTipo: product.value.tipoProduto.id,
+          nome: product.value.nome,
+          ativo: product.value.ativo,
+          valor_unitario: product.value.valor_unitario,
         };
 
         console.log(obj);
-
-        ProductService.registerProduct(obj)
+        ProductService.updateProduct(obj)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "Produto cadastrado com sucesso."
+              "O produto " +
+                product.value.nome +
+                " foi atualizado com sucesso.",
+              true
             );
           })
           .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 400) {
-              console.log(e.response.data.message);
-              mensagem = e.response.data.errors[0];
+            // let mensagem = "";
+            console.log(e)
+            /* if (e.response.status == 401) {
+              mensagem = e.response.data;
             } else {
-              mensagem = "Ocorreu um erro ao cadastrar produto.";
-            }
+              mensagem =
+                "Ocorreu um erro ao atualizar o produto " +
+                product.value.nome +
+                ".";
+            } 
 
-            methods.openModalMessage("Erro", true, mensagem);
+            methods.openModalMessage("Erro", true, mensagem); */
           });
       },
-    });
+      });
+
+
+
 
     onMounted(() => {
-      methods.getTokenAndDecode();
+    
+    methods.getTokenAndDecode();
 
-      if (token.value.admin) {
-        methods.getAllCompanies();
-      } else {
-        methods.getCompaniesByUserId();
-      }
+    methods.getProductById();
+
+    
+
     });
 
     return {
       product,
       token,
-      company,
-      companies,
       brands,
       types,
       modalMessage,
-      selectedCompany,
       selectedType,
       selectedBrand,
-      orderByCompany,
-      orderAscCompany,
-      offsetCompany,
-      limitCompany,
       loading,
+      empresaId,
+      router,
+      productBrand,
+      productType,
       ...toRefs(methods),
     };
   },

@@ -151,6 +151,18 @@ const routes = [
   },
 
   {
+    path: '/editar-produto/:id',
+    name: 'EditProduct',
+    component: () => import('@/views/Product/EditProduct.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+
+  {
     path: '/marcas',
     name: 'BrandList',
     component: () => import('@/views/Brand/BrandList.vue'),

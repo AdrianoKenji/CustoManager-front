@@ -9,7 +9,9 @@
   <div class="row d-flex justify-content-center mt-4">
     <div class="row col-10">
       <div class="form-floating col-4 mb-4 float-start">
-        <select name="companies" class="form-select" v-model="selectedCompany">
+        <select name="companies" class="form-select"
+         v-model="selectedCompany"
+         :disabled="!isCompanySelected">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="company in companies" :key="company.id">
             <option :value="company.id">
@@ -32,7 +34,9 @@
 
     <div class="row col-10">
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" v-model="selectedType">
+        <select class="form-select" 
+        v-model="selectedType"
+        :disabled="isCompanySelected">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="type in types" :key="type.id">
             <option :value="type">
@@ -44,7 +48,9 @@
       </div>
 
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" v-model="selectedBrand">
+        <select class="form-select" 
+        v-model="selectedBrand"
+        :disabled="isCompanySelected">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="brand in brands" :key="brand.id">
             <option :value="brand">
@@ -63,6 +69,7 @@
           placeholder="Nome"
           v-model="product.name"
           required
+          :disabled="isCompanySelected"
         />
         <label for="floatingInputTelephone" class="ps-3 ms-1">Nome</label>
       </div>
@@ -76,6 +83,7 @@
           placeholder="Valor"
           v-model="product.value"
           required
+          :disabled="isCompanySelected"
         />
         <label for="floatingInputTelephone" class="ps-3 ms-1">Valor</label>
       </div>
@@ -91,13 +99,14 @@
     :isError="modalMessage.isError"
     :message="modalMessage.message"
     :reference="modalMessage.reference"
-    :redirect="'/produtos'"
+    :needsRefresh="modalMessage.needsRefresh"
+    @closeAction="closeAction()"
   />
 </template>
 
 <script>
 import { reactive, ref, toRefs } from "@vue/reactivity";
-import { onMounted, provide } from "@vue/runtime-core";
+import { computed, onMounted, provide } from "@vue/runtime-core";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
@@ -134,6 +143,15 @@ export default {
 
     const loading = ref(false);
 
+    const isCompanySelected = computed(() => {     
+     let notSelected = false;
+
+     if(brands.value.length == 0 && types.value.length == 0) {
+       notSelected = true;
+     }
+      return notSelected;
+    });
+
     const selectedCompany = ref(0);
     const selectedBrand = ref(0);
     const selectedType = ref(0);
@@ -149,6 +167,7 @@ export default {
       isError: false,
       message: "",
       reference: "AddProduct",
+      needsRefresh: false,
     });
 
     const methods = reactive({
@@ -158,10 +177,12 @@ export default {
         );
       },
 
-      openModalMessage(title, isError, message) {
+
+      openModalMessage(title, isError, message, needsRefresh) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
         modalMessage.value.message = message;
+        modalMessage.value.needsRefresh = needsRefresh;
 
         var modal = new bootstrap.Modal(
           document.getElementById(
@@ -187,7 +208,7 @@ export default {
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao obter as empresas.";
             }
@@ -205,12 +226,12 @@ export default {
             console.log(e);
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro.";
             }
 
-            methods.openModalMessage("Erro", true, mensagem, false);
+            methods.openModalMessage("Erro", true, mensagem, true);
           });
       },
 
@@ -222,12 +243,12 @@ export default {
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro.";
             }
 
-            methods.openModalMessage("Erro", true, mensagem, false);
+            methods.openModalMessage("Erro", true, mensagem, true);
           });
       },
 
@@ -247,7 +268,7 @@ export default {
             console.log(e);
             let mensagem = "";
             if (e.response.status == 401) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao fazer as Listagens";
             }
@@ -257,6 +278,10 @@ export default {
           .finally(() => {
             loading.value = false;
           });
+      },
+
+      closeAction() {
+        window.location.reload();
       },
 
       insertProduto() {
@@ -275,13 +300,13 @@ export default {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "Produto cadastrado com sucesso."
+              "Produto cadastrado com sucesso.",
+              true
             );
           })
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              console.log(e.response.data.message);
               mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao cadastrar produto.";
@@ -318,6 +343,7 @@ export default {
       offsetCompany,
       limitCompany,
       loading,
+      isCompanySelected,
       ...toRefs(methods),
     };
   },
