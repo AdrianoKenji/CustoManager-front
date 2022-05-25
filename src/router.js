@@ -151,6 +151,30 @@ const routes = [
   },
 
   {
+    path: '/marcas',
+    name: 'BrandList',
+    component: () => import('@/views/Brand/BrandList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+
+  {
+    path: '/tipos-produto',
+    name: 'ProductTypeList',
+    component: () => import('@/views/ProductType/ProductTypeList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+
+  {
     path: '/nao-tenho-acesso',
     name: 'Forbidden',
     component: () => import('@/views/Error/Forbidden.vue'),

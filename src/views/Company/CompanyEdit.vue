@@ -586,9 +586,6 @@ export default {
         CompanyService.getCompanyById(router.params.id)
           .then((response) => {
             company.value = response.data;
-
-            methods.responseTableEmployer(company.value.vinculos);
-            methods.responseTablePartner(company.value.associado);
           })
           .catch((e) => {
             let mensagem = "";
@@ -596,6 +593,40 @@ export default {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao buscar a empresa.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem);
+          });
+      },
+
+      getEmployerByCompanyId() {
+        EmployeeService.getEmployeeByCompanyId(router.params.id)
+          .then((response) => {
+            methods.responseTableEmployer(response.data);
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao buscar os funcionários.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem);
+          });
+      },
+
+      getPartnertByCompanyId() {
+        PartnerService.getPartnerByCompanyId(router.params.id)
+          .then((response) => {
+            methods.responseTablePartner(response.data);
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao buscar os associados.";
             }
 
             methods.openModalMessage("Erro", true, mensagem);
@@ -868,6 +899,8 @@ export default {
     onMounted(() => {
       idCompany.value = router.params.id;
       methods.getCompanyById();
+      methods.getEmployerByCompanyId();
+      methods.getPartnertByCompanyId();
       methods.getTokenToJson();
     });
 

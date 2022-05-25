@@ -1,33 +1,32 @@
 <template>
-
   <div class="row">
     <div class="col-12 text-start">
       <h3>Listagem de Produtos</h3>
       <hr class="col-10" style="height: 3px; margin-top: -5px" />
-    </div>        
+    </div>
 
-      <div class="form-floating col-4 ">
-        <select name="companies" class="form-select" v-model="selectedCompany">
-          <option value="" selected disabled>Selecione:</option>
-          <template v-for="company in companies" :key="company.id">
-            <option :value="company.id">
-              {{ company.nome }}
-            </option>
-          </template>
-        </select>
-        <label for="floatingInputCompanyName" class="ps-3 ms-1">Empresa</label>
-      </div>
+    <div class="form-floating col-3">
+      <select name="companies" class="form-select" v-model="selectedCompany">
+        <option value="" selected disabled>Selecione:</option>
+        <template v-for="company in companies" :key="company.id">
+          <option :value="company.id">
+            {{ company.nome }}
+          </option>
+        </template>
+      </select>
+      <label for="floatingInputCompanyName" class="ps-3 ms-1">Empresa</label>
+    </div>
 
-    <div class="col-3">
-        <button
-            class="btn btn-dark btn-lg rounded-circle"
-            @click="getProductsByCompanyId()"
-          >
-            <i class="bx bx-search fs-4 mt-2"></i>
-          </button>
-      </div>
+    <div class="col-2">
+      <button
+        class="btn btn-dark btn-lg rounded-circle"
+        @click="getProductsByCompanyId()"
+      >
+        <i class="bx bx-search fs-4 mt-2"></i>
+      </button>
+    </div>
 
-    <div class="col-3">
+    <div class="col-2">
       <router-link to="/criar-produto">
         <button class="btn btn-dark">
           <i class="bx bx-plus fs-5"></i>
@@ -35,7 +34,24 @@
         </button>
       </router-link>
     </div>
-    
+
+    <div class="col-2">
+      <router-link to="/marcas">
+        <button class="btn btn-dark">
+          <i class="bx bx-plus fs-5"></i>
+          <span class="ms-1">Marcas</span>
+        </button>
+      </router-link>
+    </div>
+
+    <div class="col-2">
+      <router-link to="/tipos-produto">
+        <button class="btn btn-dark">
+          <i class="bx bx-plus fs-5"></i>
+          <span class="ms-1">Tipos de produto</span>
+        </button>
+      </router-link>
+    </div>
   </div>
 
   <div class="row mt-4">
@@ -72,7 +88,10 @@
 
 <script>
 import { reactive, ref, toRefs } from "@vue/reactivity";
-import { onMounted, provide } from "@vue/runtime-core";
+import { onMounted } from "@vue/runtime-core";
+import { useRouter } from "vue-router";
+
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import Table from "@/components/Table/Table.vue";
 
@@ -80,7 +99,7 @@ import ProductService from "@/services/ProductService";
 import CompanyService from "@/services/CompanyService";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
-import { useRouter } from "vue-router";
+
 import TokenUtils from "@/utils/TokenUtils";
 
 export default {
@@ -188,8 +207,7 @@ export default {
       needsRefresh: false,
     });
 
-    const methods = reactive({ 
-
+    const methods = reactive({
       getTokenAndDecode() {
         token.value = TokenUtils.getTokenAndDecodeToJson(
           localStorage.getItem("token")
@@ -217,14 +235,13 @@ export default {
         modal.show(modalToggle);
       },
 
-       getCompaniesByUserId() {
-         
-         CompanyService.getCompaniesByUserId(token.value.id)
+      getCompaniesByUserId() {
+        CompanyService.getCompaniesByUserId(token.value.id)
           .then((response) => {
-            console.log(response.data)
+            console.log(response.data);
             companies.value = response.data;
           })
-          .catch((e) => {      
+          .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
               mensagem = e.response.data.message;
@@ -236,10 +253,17 @@ export default {
           });
       },
 
-       getProductsByCompanyId() {
-        ProductService.getProductsByCompanyId(selectedCompany.value, orderBy.value,
-          orderAsc.value, offset.value, limit.value)
+      getProductsByCompanyId() {
+        console.log(selectedCompany.value);
+        ProductService.getProductsByCompanyId(
+          selectedCompany.value,
+          orderBy.value,
+          orderAsc.value,
+          offset.value,
+          limit.value
+        )
           .then((response) => {
+            console.log(response.data);
             methods.responseTable(response.data.content);
           })
           .catch((e) => {
@@ -259,7 +283,6 @@ export default {
         orderAsc.value = event.orderAsc;
 
         methods.getProductsByCompanyId();
-        
       },
 
       search(event) {
@@ -286,7 +309,6 @@ export default {
             methods.responseTable(response.data.content);
           })
           .catch((e) => {
-
             let mensagem = "";
             if (e.response.status == 401) {
               mensagem = e.response.data.message;
@@ -326,7 +348,7 @@ export default {
           });
       },
 
-       responseTable(response) {
+      responseTable(response) {
         products.value = [];
         response.map((x) => {
           products.value.push({
@@ -368,7 +390,7 @@ export default {
       }, */
 
       changePage(event) {
-        console.log(event)
+        console.log(event);
         offset.value = event;
         methods.getProductsByCompanyId();
       },
@@ -414,15 +436,13 @@ export default {
     });
 
     onMounted(() => {
-
-    methods.getTokenAndDecode();
+      methods.getTokenAndDecode();
 
       if (token.value.admin) {
         methods.getAllCompanies();
       } else {
         methods.getCompaniesByUserId();
       }
-
     });
 
     return {

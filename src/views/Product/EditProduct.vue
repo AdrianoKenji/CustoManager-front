@@ -107,7 +107,7 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import TokenUtils from "@/utils/TokenUtils";
 import ProductService from "@/services/ProductService";
 import MarcaProdutoService from "@/services/MarcaProdutoService";
-import ProductTypeService from "@/services/ProductTypeService";
+import TipoProdutoService from "@/services/ProductTypeService";
 
 export default {
   name: "AddProduct",
@@ -215,7 +215,7 @@ export default {
       },
 
       getTipoByCompanyId() {
-        ProductTypeService.getTipoByCompanyId(selectedCompany.value)
+        TipoProdutoService.getTipoByCompanyId(selectedCompany.value)
           .then((response) => {
             types.value = response.data.content;
           })

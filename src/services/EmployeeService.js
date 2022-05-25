@@ -4,6 +4,14 @@ var urlBase = "/vinculos"
 
 class EmployeeService {
 
+    getEmployeeByCompanyId(id) {
+        return baseURL.get(urlBase + "/get-vinculos-by-empresa-id?idEmpresa=" + id, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
     insertEmployerInCompany(obj) {
         return baseURL.post(urlBase + "/criar-vinculo", obj, {
             headers: {

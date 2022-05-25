@@ -1,16 +1,46 @@
 <template>
   <div class="row">
-    <div class="col-6 text-start">
-      <h3>Listagem de Empresas</h3>
-      <hr class="col-6" style="height: 3px; margin-top: -5px" />
+    <div class="col-12 text-start">
+      <h3>Listagem de Tipos de produtos</h3>
+      <hr class="col-10" style="height: 3px; margin-top: -5px" />
     </div>
-    <div class="col-5 text-end">
-      <router-link to="/criar-empresa">
-        <button class="btn btn-dark">
-          <i class="bx bx-plus fs-4"></i>
-          <i class="bx bx-buildings fs-3 mt-1"></i>
-        </button>
-      </router-link>
+
+    <div class="row">
+      <div class="d-flex justify-content-center">
+        <div class="form-floating col-3">
+          <select
+            name="companies"
+            class="form-select"
+            v-model="selectedCompany"
+          >
+            <option value="" selected disabled>Selecione:</option>
+            <template v-for="company in companies" :key="company.id">
+              <option :value="company.id">
+                {{ company.nome }}
+              </option>
+            </template>
+          </select>
+          <label for="floatingInputCompanyName" class="ps-3 ms-1"
+            >Empresa</label
+          >
+        </div>
+
+        <div class="col-1">
+          <button
+            class="btn btn-dark btn-lg rounded-circle"
+            @click="getProductTypeByCompanyId()"
+          >
+            <i class="bx bx-search fs-4 mt-2"></i>
+          </button>
+        </div>
+
+        <div class="col-4 mt-1">
+          <button class="btn btn-dark" @click="openModalAddProductType()">
+            <i class="bx bx-plus fs-5"></i>
+            <span class="ms-1">Cadastrar Tipo de produto</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -19,14 +49,13 @@
       :isList="true"
       :Header="header"
       :loading="loading"
-      :ArrayData="companies"
+      :ArrayData="productsType"
       :offset="offset"
       :limit="limit"
       :total="total"
       :hasFilter="true"
       :hasPagination="true"
       :editButton="true"
-      :removeButton="true"
       @search="search($event)"
       @clean="resetTable()"
       @ordenation="ordenation($event)"
@@ -35,6 +64,10 @@
       @changePage="changePage($event)"
     />
   </div>
+
+  <ModalAddProductType @closeAction="closeAction()" />
+
+  <ModalEditProductType @closeAction="closeAction()" />
 
   <ModalMessage
     :title="modalMessage.title"
@@ -55,24 +88,36 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import Table from "@/components/Table/Table.vue";
 
-import ModalMessage from "@/components/Modal/ModalMessage.vue";
-
+import BrandService from "@/services/BrandService";
 import CompanyService from "@/services/CompanyService";
 
+import ModalMessage from "@/components/Modal/ModalMessage.vue";
+import ModalAddProductType from "./Modal/AddProductType.vue";
+import ModalEditProductType from "./Modal/EditProductType.vue";
+
 import TokenUtils from "@/utils/TokenUtils";
+import ProductTypeService from "@/services/ProductTypeService";
 
 export default {
-  name: "CompanyList",
+  name: "ProductTypeList",
   components: {
     Table,
     ModalMessage,
+    ModalAddProductType,
+    ModalEditProductType,
   },
   setup() {
     const router = useRouter();
 
     const token = ref({});
 
+    const productsType = ref([]);
+
     const companies = ref([]);
+    const company = ref([]);
+    const selectedCompany = ref(0);
+
+    const selectedProductType = ref(0);
 
     const header = ref([
       {
@@ -86,7 +131,7 @@ export default {
       },
       {
         id: 2,
-        name: "Razão Social",
+        name: "Nome",
         key: "nome",
         value: true,
         order: true,
@@ -94,31 +139,22 @@ export default {
         filter: "filterName",
       },
       {
-        id: 3,
-        name: "CNPJ",
-        key: "cnpj",
+        id: 5,
+        name: "Descrição",
+        key: "descricao",
         value: true,
         order: true,
         type: "text",
-        filter: "filterCNPJ",
+        filter: "filterDescription",
       },
       {
         id: 4,
-        name: "Telefone",
-        key: "telefone",
+        name: "Ativo",
+        key: "ativo",
         value: true,
         order: true,
         type: "text",
-        filter: "filterCpf",
-      },
-      {
-        id: 5,
-        name: "Endereço",
-        key: "endereco",
-        value: true,
-        order: true,
-        type: "text",
-        filter: "filterTelephone",
+        filter: "filterAtivo",
       },
       {
         name: "Ações",
@@ -128,11 +164,18 @@ export default {
     ]);
 
     const offset = ref(0);
-    const limit = ref(5);
+    const offsetCompany = ref(0);
+
+    const limit = ref(10);
+    const limitCompany = ref(9999);
+
     const total = ref(0);
 
-    const orderBy = ref("Id");
+    const orderBy = ref("id");
     const orderAsc = ref(false);
+
+    const orderByCompany = ref("id");
+    const orderAscCompany = ref(false);
 
     const loading = ref(false);
 
@@ -140,7 +183,7 @@ export default {
       title: "",
       isError: false,
       message: "",
-      reference: "CompanyList",
+      reference: "ProductTypeList",
       needsRefresh: false,
     });
 
@@ -172,21 +215,64 @@ export default {
         modal.show(modalToggle);
       },
 
+      openModalAddProductType() {
+        var modal = new bootstrap.Modal(
+          document.getElementById("modalAddProductType"),
+          {
+            keyboard: false,
+            backdrop: "static",
+          }
+        );
+        var modalToggle = document.getElementById("modalAddProductType");
+        modal.show(modalToggle);
+      },
+
       getCompaniesByUserId() {
         CompanyService.getCompaniesByUserId(token.value.id)
-          .then(() => {
+          .then((response) => {
+            console.log(response.data);
             companies.value = response.data;
           })
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
-              mensagem = "Ocorreu um erro ao fazer as Listagens.";
+              mensagem = "Ocorreu um erro ao obter as empresas.";
             }
 
             methods.openModalMessage("Erro", true, mensagem, false);
           });
+      },
+
+      getProductTypeByCompanyId() {
+        ProductTypeService.getTipoByCompanyId(
+          selectedCompany.value,
+          orderBy.value,
+          orderAsc.value,
+          offset.value,
+          limit.value
+        )
+          .then((response) => {
+            methods.responseTable(response.data.content);
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 400) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao fazer as listagens.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
+      },
+
+      ordenation(event) {
+        orderBy.value = event.orderBy;
+        orderAsc.value = event.orderAsc;
+
+        methods.getProductTypeByCompanyId();
       },
 
       search(event) {
@@ -194,14 +280,11 @@ export default {
           filters: [],
         };
 
-        console.log(event);
         let obj = methods.formatFilter(event);
 
         arrayFilters.filters.push(obj);
 
-        console.log(arrayFilters);
-
-        CompanyService.search(
+        ProductTypeService.search(
           arrayFilters,
           orderBy.value,
           orderAsc.value,
@@ -224,30 +307,20 @@ export default {
           });
       },
 
-      ordenation(event) {
-        orderBy.value = event.orderBy;
-        orderAsc.value = event.orderAsc;
-
-        if (token.value.admin) {
-          methods.getAllCompanies();
-        } else {
-          methods.getCompaniesByUserId();
-        }
-      },
-
       getAllCompanies() {
         loading.value = true;
         CompanyService.getAllCompanies(
-          orderBy.value,
-          orderAsc.value,
-          offset.value,
-          limit.value
+          orderByCompany.value,
+          orderAscCompany.value,
+          offsetCompany.value,
+          limitCompany.value
         )
           .then((response) => {
-            total.value = response.data.totalElements;
-            methods.responseTable(response.data.content);
+            console.log(response.data.content);
+            companies.value = response.data.content;
           })
           .catch((e) => {
+            console.log(e);
             let mensagem = "";
             if (e.response.status == 401) {
               mensagem = e.response.data.message;
@@ -263,49 +336,40 @@ export default {
       },
 
       responseTable(response) {
-        companies.value = [];
+        productsType.value = [];
         response.map((x) => {
-          companies.value.push({
+          productsType.value.push({
             Id: x.id,
             Nome: x.nome,
-            CNPJ: x.cnpj,
-            Endereco: x.endereco,
-            Telefone: x.telefone,
+            Descricao: x.descricao,
+            Ativo: x.ativo,
           });
         });
       },
 
       edit(event) {
-        router.push("/editar-empresa/" + event.Id);
-      },
-
-      remove(event) {
-        CompanyService.deleteCompany(event.Id)
-          .then(() => {
-            methods.openModalMessage(
-              "Sucesso",
-              false,
-              "A empresa " + event.Nome + " foi deletada.",
-              true
-            );
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.message;
-            } else {
-              mensagem =
-                "Ocorreu um erro ao deletar a empresa " + event.Nome + ".";
-            }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
-          });
+        selectedProductType.value = {
+          Id: event.Id,
+          IdEmpresa: selectedCompany.value,
+          Nome: event.Nome,
+          Ativo: event.Ativo,
+          Descricao: event.Descricao
+        };
+        var modal = new bootstrap.Modal(
+          document.getElementById("modalEditProductType"),
+          {
+            keyboard: false,
+            backdrop: "static",
+          }
+        );
+        var modalToggle = document.getElementById("modalEditProductType");
+        modal.show(modalToggle);
       },
 
       changePage(event) {
         console.log(event);
         offset.value = event;
-        methods.getAllCompanies();
+        methods.getProductTypeByCompanyId();
       },
 
       formatFilter(event) {
@@ -340,11 +404,11 @@ export default {
       },
 
       closeAction() {
-        methods.getAllCompanies();
+        methods.getProductTypeByCompanyId();
       },
 
       resetTable() {
-        methods.getAllCompanies();
+        methods.getProductTypeByCompanyId();
       },
     });
 
@@ -358,16 +422,27 @@ export default {
       }
     });
 
+    provide("companies", companies);
+    provide("selectedProductType", selectedProductType);
+
     return {
       router,
       token,
+      productsType,
+      company,
       companies,
+      selectedCompany,
+      selectedProductType,
       header,
       offset,
       limit,
       total,
       orderBy,
       orderAsc,
+      orderByCompany,
+      orderAscCompany,
+      offsetCompany,
+      limitCompany,
       loading,
       modalMessage,
       ...toRefs(methods),

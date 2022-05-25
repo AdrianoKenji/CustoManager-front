@@ -4,6 +4,14 @@ var urlBase = "/associados"
 
 class PartnerService {
 
+    getPartnerByCompanyId(id) {
+        return baseURL.get(urlBase + "/get-associados-by-empresa-id/" + id, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
     insertPartnerInCompany(obj) {
         return baseURL.post(urlBase + "/register", obj, {
             headers: {
