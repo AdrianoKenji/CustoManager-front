@@ -50,12 +50,10 @@
       :hasFilter="true"
       :hasPagination="true"
       :editButton="true"
-      :removeButton="true"
       @search="search($event)"
       @clean="resetTable()"
       @ordenation="ordenation($event)"
       @edit="edit($event)"
-      @remove="remove($event)"
       @changePage="changePage($event)"
     />
   </div>
@@ -165,12 +163,13 @@ export default {
     ]);
 
     const offset = ref(0);
-    const offsetCompany = ref(0);
-
-    const limit = ref(10);
-    const limitCompany = ref(9999);
-
+    const limit = ref(5);
     const total = ref(0);
+
+    
+    const offsetCompany = ref(0);    
+    const limitCompany = ref(9999);
+    const totalCompany = ref(0);
 
     const orderBy = ref("id");
     const orderAsc = ref(false);
@@ -217,11 +216,10 @@ export default {
         modal.show(modalToggle);
       },
 
-       getCompaniesByUserId() {
-         
+       getCompaniesByUserId() {         
          CompanyService.getCompaniesByUserId(token.value.id)
           .then((response) => {
-            console.log(response.data)
+            totalCompany.value = response.data.totalElements;
             companies.value = response.data;
           })
           .catch((e) => {      
@@ -240,6 +238,7 @@ export default {
         ProductService.getProductsByCompanyId(selectedCompany.value, orderBy.value,
           orderAsc.value, offset.value, limit.value)
           .then((response) => {
+            total.value = response.data.totalElements;
             methods.responseTable(response.data.content);
           })
           .catch((e) => {
@@ -334,8 +333,8 @@ export default {
             Nome: x.nome,
             Valor: x.valor_unitario,
             Ativo: x.ativo,
-            Tipo: x.nomeTipoProduto,
-            Marca: x.nomeMarcaProduto,
+            Tipo: x.tipoProduto.nome,
+            Marca: x.marcaProduto.nome,
           });
         });
       },
@@ -343,29 +342,6 @@ export default {
       edit(event) {
         router.push("/editar-produto/" + event.Id);
       },
-
-      /* remove(event) {
-        ProductService.deleteProduct(event.Id)
-          .then(() => {
-            methods.openModalMessage(
-              "Sucesso",
-              false,
-              "A empresa " + event.Nome + " foi deletada.",
-              true
-            );
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.message;
-            } else {
-              mensagem =
-                "Ocorreu um erro ao deletar a empresa " + event.Nome + ".";
-            }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
-          });
-      }, */
 
       changePage(event) {
         console.log(event)
@@ -436,6 +412,7 @@ export default {
       limit,
       selectedCompany,
       total,
+      totalCompany,
       orderBy,
       orderAsc,
       orderByCompany,
