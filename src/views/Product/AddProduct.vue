@@ -290,7 +290,7 @@ export default {
           idMarca: selectedBrand.value.id,
           idTipo: selectedType.value.id,
           nome: product.value.name,
-          valor_unitario: product.value.value,
+          valorUnitario: product.value.value,
         };
 
         console.log(obj);

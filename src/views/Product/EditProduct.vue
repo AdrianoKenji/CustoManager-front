@@ -56,7 +56,9 @@
 
     <div class="row col-10">
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" v-model="product.tipoProduto">
+        <select class="form-select" 
+        @change="verifyType()"
+        v-model="product.tipoProduto">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="type in types" :key="type.id">
             <option :value="type">
@@ -68,7 +70,9 @@
       </div>      
 
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" v-model="product.marcaProduto">
+        <select class="form-select" 
+        @change="verifyBrand()"
+        v-model="product.marcaProduto">
           <option value="" selected disabled>Selecione:</option>
           <template v-for="brand in brands" :key="brand.id">
             <option :value="brand">
@@ -98,7 +102,7 @@
           class="form-control"
           id="floatingInputTelephone"
           placeholder="Valor"
-          v-model="product.valor_unitario"
+          v-model="product.valorUnitario"
           required
         />
         <label for="floatingInputTelephone" class="ps-3 ms-1">Valor</label>
@@ -127,7 +131,7 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import TokenUtils from "@/utils/TokenUtils";
 import ProductService from '@/services/ProductService';
 import MarcaProdutoService from '@/services/MarcaProdutoService';
-import TipoProdutoService from '@/services/TipoProdutoService';
+import TipoProdutoService from '@/services/ProductTypeService';
 
 export default {
   name: "EditProduct",
@@ -145,9 +149,6 @@ export default {
 
     const brands = ref([]);
     const types = ref([]);
-
-    const selectedBrand = ref(0);
-    const selectedType = ref(0);
 
     const empresaId = ref(0);
 
@@ -170,13 +171,22 @@ export default {
         );
       },
 
+      verifyType(event) {
+        productType.value = product.value.tipoProduto.id;
+      },
+
+      verifyBrand(event) {
+        productBrand.value = product.value.marcaProduto.id;
+      },
+
       getProductById() {
         ProductService.getProductById(router.params.id)
           .then((response) => {
             product.value = response.data; 
+            console.log(product.value.tipoProduto.nome)
 
             methods.getMarcaByCompanyId(product.value.idEmpresa);
-            methods.getTipoByCompanyId(product.value.idEmpresa);
+            methods.getTipoByCompanyId(product.value.idEmpresa);      
 
           })
           .catch((e) => {
@@ -250,14 +260,18 @@ export default {
       },
 
      updateProduct() {
+
+       let newBrand = (productBrand.value == "") ? product.value.marcaProduto.id : productBrand.value;
+       let newType =  (productType.value == "") ? product.value.tipoProduto.id : productType.value;
+
         let obj = {
           id: product.value.id,
           idEmpresa: product.value.idEmpresa,
-          idMarca: product.value.marcaProduto.id,
-          idTipo: product.value.tipoProduto.id,
+          idMarca: newBrand,
+          idTipo: newType,
           nome: product.value.nome,
           ativo: product.value.ativo,
-          valor_unitario: product.value.valor_unitario,
+          valorUnitario: product.value.valorUnitario,
         };
 
         console.log(obj);
@@ -273,10 +287,10 @@ export default {
             );
           })
           .catch((e) => {
-            // let mensagem = "";
+             let mensagem = "";
             console.log(e)
-            /* if (e.response.status == 401) {
-              mensagem = e.response.data;
+             if (e.response.status == 400) {
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem =
                 "Ocorreu um erro ao atualizar o produto " +
@@ -284,7 +298,7 @@ export default {
                 ".";
             } 
 
-            methods.openModalMessage("Erro", true, mensagem); */
+            methods.openModalMessage("Erro", true, mensagem, false); 
           });
       },
       });
@@ -296,9 +310,7 @@ export default {
     
     methods.getTokenAndDecode();
 
-    methods.getProductById();
-
-    
+    methods.getProductById();    
 
     });
 
@@ -308,8 +320,6 @@ export default {
       brands,
       types,
       modalMessage,
-      selectedType,
-      selectedBrand,
       loading,
       empresaId,
       router,

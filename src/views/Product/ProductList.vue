@@ -353,7 +353,7 @@ export default {
           products.value.push({
             Id: x.id,
             Nome: x.nome,
-            Valor: x.valor_unitario,
+            Valor: x.valorUnitario,
             Ativo: x.ativo,
             Tipo: x.tipoProduto.nome,
             Marca: x.marcaProduto.nome,
