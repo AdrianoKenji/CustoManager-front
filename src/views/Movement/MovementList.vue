@@ -132,7 +132,8 @@ export default {
         key: "tipoMovimentacao",
         value: true,
         order: true,
-        type: "text",
+        type: "select",
+        options: ["VENDA", "COMPRA"],
         filter: "filterTipoMovimentacao",
       },
       {
@@ -157,7 +158,7 @@ export default {
         id: 5,
         name: "Data da Movimentação",
         key: "dataMovimentacao",
-        value: true,
+        value: false,
         order: true,
         type: "text",
         filter: "filterDataMovimentacao",
@@ -168,7 +169,7 @@ export default {
         key: "valorTotal",
         value: true,
         order: true,
-        type: "text",
+        type: "number",
         filter: "filterValorTotal",
       },
       {
@@ -295,16 +296,13 @@ export default {
       },
 
       search(event) {
-        let arrayFilters = {
-          filters: [],
-        };
 
         let obj = methods.formatFilter(event);
 
-        arrayFilters.filters.push(obj);
-
         MovementService.search(
-          arrayFilters,
+          obj.value,
+          obj.key,
+          selectedCompany.value,
           orderBy.value,
           orderAsc.value,
           offset.value,
@@ -317,7 +315,7 @@ export default {
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 401) {
-              mensagem = e.response.data.errors[0];
+              mensagem = e.response.data.message;
             } else {
               mensagem = "Ocorreu um erro ao fazer a filtragem.";
             }
@@ -421,7 +419,7 @@ export default {
         methods.getMovementByCompanyId();
       },
 
-      formatFilter(event) {
+     formatFilter(event) {
         let obj = {
           field_type: null,
           key: null,
@@ -429,29 +427,14 @@ export default {
           value: null,
         };
 
-        if (event.selectedColumn.type == "text") {
-          obj.field_type = "STRING";
-          obj.key = event.selectedColumn.key;
-          obj.operator = "LIKE";
-          obj.value = event.filteredItem;
-        } else if (event.selectedColumn.type == "number") {
-          obj.field_type = "LONG";
-          obj.key = event.selectedColumn.key;
-          obj.operator = "EQUAL";
-          obj.value = event.filteredItem;
-        } else if (
-          event.filteredItem == "true" ||
-          event.filteredItem == "false"
-        ) {
-          obj.field_type = "BOOLEAN";
-          obj.key = event.selectedColumn.key;
-          obj.operator = "EQUAL";
-          obj.value = event.filteredItem;
-        }
+        obj.key = event.selectedColumn.key;
+        obj.value = event.filteredItem;
+        
 
         return obj;
       },
 
+      
       closeAction() {
         methods.getMovementByCompanyId();
       },

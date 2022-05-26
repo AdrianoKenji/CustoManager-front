@@ -25,12 +25,15 @@ class MovementService {
         })
     }
 
-    search(filters, orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
-        return baseURL.post(urlBase + "/search" +
-            '?orderBy=' + orderBy +
+    search(busca, chave, idEmpresa, orderBy = "Id", orderAsc = false, offset = 0, limit = 0) {
+        return baseURL.get(urlBase + "/search" +
+            '?busca=' + busca +
+            '&chave=' + chave +
+            '&idEmpresa=' + idEmpresa +
+            '&orderBy=' + orderBy +
             '&orderAsc=' + orderAsc +
             '&pageNumber=' + offset +
-            '&pageSize=' + limit, filters, {
+            '&pageSize=' + limit, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

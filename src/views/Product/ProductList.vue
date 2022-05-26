@@ -141,10 +141,10 @@ export default {
       {
         id: 3,
         name: "Valor",
-        key: "valor",
+        key: "valorUnitario",
         value: true,
         order: true,
-        type: "text",
+        type: "number",
         filter: "filterValor",
       },
       {
@@ -153,13 +153,14 @@ export default {
         key: "ativo",
         value: true,
         order: true,
-        type: "text",
+        type: "select",
+        options: ["true", "false"],
         filter: "filterAtivo",
       },
       {
         id: 5,
         name: "Tipo",
-        key: "nomeTipoProduto",
+        key: "tipoProduto",
         value: true,
         order: true,
         type: "text",
@@ -168,7 +169,7 @@ export default {
       {
         id: 6,
         name: "Marca",
-        key: "nomeMarcaProduto",
+        key: "marcaProduto",
         value: true,
         order: true,
         type: "text",
@@ -284,19 +285,13 @@ export default {
       },
 
       search(event) {
-        let arrayFilters = {
-          filters: [],
-        };
 
-        console.log(event);
         let obj = methods.formatFilter(event);
 
-        arrayFilters.filters.push(obj);
-
-        console.log(arrayFilters);
-
         ProductService.search(
-          arrayFilters,
+          obj.value,
+          obj.key,
+          selectedCompany.value,
           orderBy.value,
           orderAsc.value,
           offset.value,
@@ -378,25 +373,9 @@ export default {
           value: null,
         };
 
-        if (event.selectedColumn.type == "text") {
-          obj.field_type = "STRING";
-          obj.key = event.selectedColumn.key;
-          obj.operator = "LIKE";
-          obj.value = event.filteredItem;
-        } else if (event.selectedColumn.type == "number") {
-          obj.field_type = "LONG";
-          obj.key = event.selectedColumn.key;
-          obj.operator = "EQUAL";
-          obj.value = event.filteredItem;
-        } else if (
-          event.filteredItem == "true" ||
-          event.filteredItem == "false"
-        ) {
-          obj.field_type = "BOOLEAN";
-          obj.key = event.selectedColumn.key;
-          obj.operator = "EQUAL";
-          obj.value = event.filteredItem;
-        }
+        obj.key = event.selectedColumn.key;
+        obj.value = event.filteredItem;
+        
 
         return obj;
       },
