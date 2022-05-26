@@ -1,78 +1,70 @@
 <template>
   <div class="row">
     <div class="col-12 text-start">
-      <h3>Listagem de Produtos</h3>
+      <h3>Listagem de Movimentações</h3>
       <hr class="col-10" style="height: 3px; margin-top: -5px" />
     </div>
 
-    <div class="form-floating col-3">
-      <select name="companies" class="form-select" v-model="selectedCompany">
-        <option value="" selected disabled>Selecione:</option>
-        <template v-for="company in companies" :key="company.id">
-          <option :value="company.id">
-            {{ company.nome }}
-          </option>
-        </template>
-      </select>
-      <label for="floatingInputCompanyName" class="ps-3 ms-1">Empresa</label>
+    <div class="row">
+      <div class="d-flex justify-content-center">
+        <div class="form-floating col-3">
+          <select
+            name="companies"
+            class="form-select"
+            v-model="selectedCompany"
+          >
+            <option value="" selected disabled>Selecione:</option>
+            <template v-for="company in companies" :key="company.id">
+              <option :value="company.id">
+                {{ company.nome }}
+              </option>
+            </template>
+          </select>
+          <label for="floatingInputCompanyName" class="ps-3 ms-1"
+            >Empresa</label
+          >
+        </div>
+
+        <div class="col-1">
+          <button
+            class="btn btn-dark btn-lg rounded-circle"
+            @click="getMovementByCompanyId()"
+          >
+            <i class="bx bx-search fs-4 mt-2"></i>
+          </button>
+        </div>
+
+        <div class="col-4 mt-1">
+          <button class="btn btn-dark" @click="openModalAddMovement()">
+            <i class="bx bx-plus fs-5"></i>
+            <span class="ms-1">Cadastrar Movimentação</span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="col-2">
-      <button
-        class="btn btn-dark btn-lg rounded-circle"
-        @click="getProductsByCompanyId()"
-      >
-        <i class="bx bx-search fs-4 mt-2"></i>
-      </button>
-    </div>
-
-    <div class="col-2">
-      <router-link to="/criar-produto">
-        <button class="btn btn-dark">
-          <i class="bx bx-plus fs-5"></i>
-          <span class="ms-1">Cadastrar Produto</span>
-        </button>
-      </router-link>
-    </div>
-
-    <div class="col-2">
-      <router-link to="/marcas">
-        <button class="btn btn-dark">
-          <i class="bx bx-plus fs-5"></i>
-          <span class="ms-1">Marcas</span>
-        </button>
-      </router-link>
-    </div>
-
-    <div class="col-2">
-      <router-link to="/tipos-produto">
-        <button class="btn btn-dark">
-          <i class="bx bx-plus fs-5"></i>
-          <span class="ms-1">Tipos de produto</span>
-        </button>
-      </router-link>
+    <div class="row mt-4">
+      <Table
+        :isList="true"
+        :Header="header"
+        :loading="loading"
+        :ArrayData="movements"
+        :offset="offset"
+        :limit="limit"
+        :total="total"
+        :hasFilter="true"
+        :hasPagination="true"
+        :editButton="true"
+        @search="search($event)"
+        @clean="resetTable()"
+        @ordenation="ordenation($event)"
+        @edit="edit($event)"
+        @changePage="changePage($event)"
+      />
     </div>
   </div>
 
-  <div class="row mt-4">
-    <Table
-      :isList="true"
-      :Header="header"
-      :loading="loading"
-      :ArrayData="products"
-      :offset="offset"
-      :limit="limit"
-      :total="total"
-      :hasFilter="true"
-      :hasPagination="true"
-      :editButton="true"
-      @search="search($event)"
-      @clean="resetTable()"
-      @ordenation="ordenation($event)"
-      @edit="edit($event)"
-      @changePage="changePage($event)"
-    />
-  </div>
+  <ModalAddMovement />
 
   <ModalMessage
     :title="modalMessage.title"
@@ -86,38 +78,40 @@
 
 <script>
 import { reactive, ref, toRefs } from "@vue/reactivity";
-import { onMounted } from "@vue/runtime-core";
-import { useRouter } from "vue-router";
+import { onMounted, provide, watch } from "@vue/runtime-core";
 
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import Table from "@/components/Table/Table.vue";
 
-import ProductService from "@/services/ProductService";
 import CompanyService from "@/services/CompanyService";
+import MovementService from "@/services/MovementService";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
+import ModalAddMovement from "./Modal/AddMovement.vue";
 
 import TokenUtils from "@/utils/TokenUtils";
+import PartnerService from "@/services/PartnerService";
 
 export default {
-  name: "ProductList",
+  name: "MovementList",
   components: {
     Table,
     ModalMessage,
+    ModalAddMovement,
   },
   setup() {
-    const router = useRouter();
-
     const token = ref({});
 
-    const products = ref([]);
+    const movements = ref([]);
 
     const companies = ref([]);
-
     const company = ref([]);
-
     const selectedCompany = ref(0);
+
+    const partners = ref([]);
+
+    const selectedMovement = ref(0);
 
     const header = ref([
       {
@@ -131,48 +125,48 @@ export default {
       },
       {
         id: 2,
-        name: "Nome",
-        key: "nome",
+        name: "Tipo de Movimentação",
+        key: "tipoMovimentacao",
         value: true,
         order: true,
         type: "text",
-        filter: "filterName",
+        filter: "filterTipoMovimentacao",
       },
       {
         id: 3,
-        name: "Valor",
-        key: "valor",
+        name: "Associado",
+        key: "associado",
         value: true,
         order: true,
         type: "text",
-        filter: "filterValor",
+        filter: "filterAssociado",
       },
       {
         id: 4,
-        name: "Ativo",
-        key: "ativo",
+        name: "Descrição",
+        key: "descricao",
         value: true,
         order: true,
         type: "text",
-        filter: "filterAtivo",
+        filter: "filterDescricao",
       },
       {
         id: 5,
-        name: "Tipo",
-        key: "nomeTipoProduto",
+        name: "Data da Movimentação",
+        key: "dataMovimentacao",
         value: true,
         order: true,
         type: "text",
-        filter: "filterTipo",
+        filter: "filterDataMovimentacao",
       },
       {
         id: 6,
-        name: "Marca",
-        key: "nomeMarcaProduto",
+        name: "Valor Total",
+        key: "valorTotal",
         value: true,
         order: true,
         type: "text",
-        filter: "filterMarca",
+        filter: "filterValorTotal",
       },
       {
         name: "Ações",
@@ -201,7 +195,7 @@ export default {
       title: "",
       isError: false,
       message: "",
-      reference: "ProductList",
+      reference: "MovementList",
       needsRefresh: false,
     });
 
@@ -233,6 +227,18 @@ export default {
         modal.show(modalToggle);
       },
 
+      openModalAddMovement() {
+        var modal = new bootstrap.Modal(
+          document.getElementById("modalAddMovement"),
+          {
+            keyboard: false,
+            backdrop: "static",
+          }
+        );
+        var modalToggle = document.getElementById("modalAddMovement");
+        modal.show(modalToggle);
+      },
+
       getCompaniesByUserId() {
         CompanyService.getCompaniesByUserId(token.value.id)
           .then((response) => {
@@ -242,7 +248,7 @@ export default {
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao obter as empresas.";
             }
@@ -251,8 +257,8 @@ export default {
           });
       },
 
-      getProductsByCompanyId() {
-        ProductService.getProductsByCompanyId(
+      getMovementByCompanyId() {
+        MovementService.getMovementByCompanyId(
           selectedCompany.value,
           orderBy.value,
           orderAsc.value,
@@ -260,8 +266,8 @@ export default {
           limit.value
         )
           .then((response) => {
+            console.log(response.data.content);
             total.value = response.data.totalElements;
-            console.log(response.data);
             methods.responseTable(response.data.content);
           })
           .catch((e) => {
@@ -280,7 +286,7 @@ export default {
         orderBy.value = event.orderBy;
         orderAsc.value = event.orderAsc;
 
-        methods.getProductsByCompanyId();
+        methods.getMovementByCompanyId();
       },
 
       search(event) {
@@ -288,14 +294,11 @@ export default {
           filters: [],
         };
 
-        console.log(event);
         let obj = methods.formatFilter(event);
 
         arrayFilters.filters.push(obj);
 
-        console.log(arrayFilters);
-
-        ProductService.search(
+        MovementService.search(
           arrayFilters,
           orderBy.value,
           orderAsc.value,
@@ -309,7 +312,7 @@ export default {
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 401) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao fazer a filtragem.";
             }
@@ -327,14 +330,12 @@ export default {
           limitCompany.value
         )
           .then((response) => {
-            console.log(response.data.content);
             companies.value = response.data.content;
           })
           .catch((e) => {
-            console.log(e);
             let mensagem = "";
             if (e.response.status == 401) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao fazer as Listagens";
             }
@@ -346,16 +347,33 @@ export default {
           });
       },
 
+      /* getPartnersByCompanyId() {
+        PartnerService.getPartnerByCompanyId(selectedCompany.value)
+          .then((response) => {
+            partners.value = response.data;
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 401) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao buscar os associados.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
+      }, */
+
       responseTable(response) {
-        products.value = [];
+        movements.value = [];
         response.map((x) => {
-          products.value.push({
+          movements.value.push({
             Id: x.id,
-            Nome: x.nome,
-            Valor: x.valorUnitario,
-            Ativo: x.ativo,
-            Tipo: x.tipoProduto.nome,
-            Marca: x.marcaProduto.nome,
+            TipoMovimentacao: x.tipoMovimentacao,
+            Associado: x.associado.nome,
+            Descricao: x.descricao,
+            DataMovimentacao: x.dataMovimentacao,
+            ValorTotal: x.valorTotal,
           });
         });
       },
@@ -365,9 +383,8 @@ export default {
       },
 
       changePage(event) {
-        console.log(event);
         offset.value = event;
-        methods.getProductsByCompanyId();
+        methods.getMovementByCompanyId();
       },
 
       formatFilter(event) {
@@ -402,11 +419,11 @@ export default {
       },
 
       closeAction() {
-        methods.getProductsByCompanyId();
+        methods.getMovementByCompanyId();
       },
 
       resetTable() {
-        methods.getProductsByCompanyId();
+        methods.getMovementByCompanyId();
       },
     });
 
@@ -420,16 +437,20 @@ export default {
       }
     });
 
+    provide("companies", companies);
+    provide("selectedMovement", selectedMovement);
+
     return {
-      router,
       token,
-      products,
-      company,
+      movements,
       companies,
+      company,
+      selectedCompany,
+      partners,
       header,
       offset,
       limit,
-      selectedCompany,
+      selectedMovement,
       total,
       totalCompany,
       orderBy,

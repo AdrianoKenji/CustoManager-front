@@ -29,10 +29,17 @@
       </li>
       <li>
         <a href="/produtos">
-          <i class='bx bxs-shopping-bags'></i>
+          <i class="bx bxs-shopping-bags"></i>
           <span class="links_name">Produtos</span>
         </a>
         <span class="tooltip">Produtos</span>
+      </li>
+      <li>
+        <a href="/movimentacoes">
+          <i class="bx bx-transfer-alt"></i>
+          <span class="links_name">Movimentações</span>
+        </a>
+        <span class="tooltip">Movimentações</span>
       </li>
       <!-- <li>
         <a href="#">

@@ -586,6 +586,9 @@ export default {
         CompanyService.getCompanyById(router.params.id)
           .then((response) => {
             company.value = response.data;
+
+            methods.responseTableEmployer(company.value.vinculos);
+            methods.responseTablePartner(company.value.associado);
           })
           .catch((e) => {
             let mensagem = "";
@@ -599,10 +602,10 @@ export default {
           });
       },
 
-      getEmployerByCompanyId() {
+      /* getEmployerByCompanyId() {
         EmployeeService.getEmployeeByCompanyId(router.params.id)
           .then((response) => {
-            methods.responseTableEmployer(response.data);
+            
           })
           .catch((e) => {
             let mensagem = "";
@@ -619,7 +622,7 @@ export default {
       getPartnertByCompanyId() {
         PartnerService.getPartnerByCompanyId(router.params.id)
           .then((response) => {
-            methods.responseTablePartner(response.data);
+            
           })
           .catch((e) => {
             let mensagem = "";
@@ -631,7 +634,7 @@ export default {
 
             methods.openModalMessage("Erro", true, mensagem);
           });
-      },
+      }, */
 
       responseTableEmployer(response) {
         company.value.vinculos = [];
@@ -899,8 +902,8 @@ export default {
     onMounted(() => {
       idCompany.value = router.params.id;
       methods.getCompanyById();
-      methods.getEmployerByCompanyId();
-      methods.getPartnertByCompanyId();
+/*       methods.getEmployerByCompanyId();
+      methods.getPartnertByCompanyId(); */
       methods.getTokenToJson();
     });
 

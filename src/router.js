@@ -187,6 +187,18 @@ const routes = [
   },
 
   {
+    path: '/movimentacoes',
+    name: 'MovementList',
+    component: () => import('@/views/Movement/MovementList.vue'),
+    meta: {
+      layout: 'AppLayoutDashboard'
+    },
+    beforeEnter: (to, from, next) => {
+      validatePerm.canEnterPage(next)
+    }
+  },
+
+  {
     path: '/nao-tenho-acesso',
     name: 'Forbidden',
     component: () => import('@/views/Error/Forbidden.vue'),

@@ -1,19 +1,19 @@
 import baseURL from "@/api"
 
-var urlBase = "/tipo-produto"
+var urlBase = "/movimentacoes"
 
-class ProductTypeService {
+class MovementService {
 
-    registerProductType(obj) {
-        return baseURL.post(urlBase + "/cadastrar-tipo", obj, {
+    registerMovement(obj) {
+        return baseURL.post(urlBase + "/cadastrar", obj, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }
         })
     }
 
-    getTipoByCompanyId(id, orderBy = "id", orderAsc = false, offset = 0, limit = 9999) {
-        return baseURL.get(urlBase + "/get-tipos-produto-by-empresa-id" +
+    getMovementByCompanyId(id, orderBy = "id", orderAsc = false, offset = 0, limit = 0) {
+        return baseURL.get(urlBase + "/get-movimentacoes-by-empresa-id" +
             '?idEmpresa=' + id +
             '&orderBy=' + orderBy +
             '&orderAsc=' + orderAsc +
@@ -37,7 +37,7 @@ class ProductTypeService {
         })
     }
 
-    getProductTypeById(id) {
+    getBrandById(id) {
         return baseURL.get(urlBase + "/get-by-id/" + id, {
             headers: {
                 'Authorization': localStorage.getItem('token')
@@ -45,8 +45,8 @@ class ProductTypeService {
         })
     }
 
-    updateProductType(productType) {
-        return baseURL.put(urlBase + "/update", productType, {
+    updateMovement(movement) {
+        return baseURL.put(urlBase + "/update", movement, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }
@@ -54,4 +54,4 @@ class ProductTypeService {
     }
 }
 
-export default new ProductTypeService();
+export default new MovementService();
