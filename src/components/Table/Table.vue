@@ -11,7 +11,9 @@
       :columns="Header"
       :loading="loading"
       :editButton="editButton"
+      :viewButton="viewButton"
       :removeButton="removeButton"
+      @view="view($event)"
       @edit="edit($event)"
       @remove="remove($event)"
       @ordenation="ordenation($event)"
@@ -89,13 +91,18 @@ export default {
       required: false,
       default: false,
     },
+    viewButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     removeButton: {
       type: Boolean,
       required: false,
       default: false,
     },
   },
-  emits: ["search", "clean", "ordenation", "edit", "remove", "changePage"],
+  emits: ["search", "clean", "ordenation", "edit", "view", "remove", "changePage"],
   setup(props, { emit }) {
     const methods = reactive({
       search(event) {
@@ -109,7 +116,9 @@ export default {
       edit(event) {
         emit("edit", event);
       },
-
+      view(event) {
+        emit("view", event);
+      },
       remove(event) {
         emit("remove", event);
       },

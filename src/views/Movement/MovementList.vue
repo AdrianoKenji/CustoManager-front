@@ -54,17 +54,20 @@
         :total="total"
         :hasFilter="true"
         :hasPagination="true"
-        :editButton="true"
+        :viewButton="true"
+        :removeButton="true"
+        @view="view($event)"
+        @remove="remove($event)"
         @search="search($event)"
         @clean="resetTable()"
         @ordenation="ordenation($event)"
-        @edit="edit($event)"
         @changePage="changePage($event)"
       />
     </div>
   </div>
 
   <ModalAddMovement />
+  <ModalViewMovement />
 
   <ModalMessage
     :title="modalMessage.title"
@@ -89,6 +92,7 @@ import MovementService from "@/services/MovementService";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
 import ModalAddMovement from "./Modal/AddMovement.vue";
+import ModalViewMovement from "./Modal/ViewMovement.vue";
 
 import TokenUtils from "@/utils/TokenUtils";
 import PartnerService from "@/services/PartnerService";
@@ -99,6 +103,7 @@ export default {
     Table,
     ModalMessage,
     ModalAddMovement,
+    ModalViewMovement,
   },
   setup() {
     const token = ref({});
@@ -110,8 +115,6 @@ export default {
     const selectedCompany = ref(0);
 
     const partners = ref([]);
-
-    const selectedMovement = ref(0);
 
     const header = ref([
       {
@@ -188,6 +191,8 @@ export default {
 
     const orderByCompany = ref("id");
     const orderAscCompany = ref(false);
+
+    const selectedMovement = ref({});
 
     const loading = ref(false);
 
@@ -334,35 +339,64 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if(e.response && e.response.data.errors.length > 0) {
+              if (e.response.status == 401) {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao fazer as Listagens";
             }
 
             methods.openModalMessage("Erro", true, mensagem, false);
+          }
+          else {
+            console.log(e)
+          }
+            
           })
           .finally(() => {
             loading.value = false;
           });
       },
 
-      /* getPartnersByCompanyId() {
-        PartnerService.getPartnerByCompanyId(selectedCompany.value)
-          .then((response) => {
-            partners.value = response.data;
+      view(event) {
+        selectedMovement.value = event;
+        methods.openModalViewMovement();
+      },
+
+      openModalViewMovement() {
+        var modal = new bootstrap.Modal(
+          document.getElementById("modalViewMovement"),
+          {
+            keyboard: false,
+            backdrop: "static",
+          }
+        );
+        var modalToggle = document.getElementById("modalViewMovement");
+        modal.show(modalToggle);
+      },
+
+      remove(event) {
+        MovementService.delete(event.Id)
+          .then(() => {
+            methods.openModalMessage(
+              "Sucesso",
+              false,
+              "A movimentação " + event.Id + " foi deletada.",
+              true
+            );
           })
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 401) {
-              mensagem = e.response.data.errors[0];
+              mensagem = e.response.data.message;
             } else {
-              mensagem = "Ocorreu um erro ao buscar os associados.";
+              mensagem =
+                "Ocorreu um erro ao deletar a movimentação " + event.Id + ".";
             }
 
             methods.openModalMessage("Erro", true, mensagem, false);
           });
-      }, */
+      },
 
       responseTable(response) {
         movements.value = [];

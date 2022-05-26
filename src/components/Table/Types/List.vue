@@ -46,9 +46,11 @@
             <Row
               :row="data"
               :items="columns"
+              :viewButton="viewButton"
               :editButton="editButton"
               :removeButton="removeButton"
               @edit="edit($event)"
+              @view="view($event)"
               @remove="remove($event)"
             />
           </tr>
@@ -108,17 +110,26 @@ export default {
       required: false,
       default: false,
     },
+    viewButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     removeButton: {
       type: Boolean,
       required: false,
       default: false,
     },
   },
-  emits: ["remove", "edit", "ordenation"],
+  emits: ["remove", "edit", "view", "ordenation"],
   setup(props, { emit }) {
     const methods = reactive({
       edit(event) {
         emit("edit", event);
+      },
+
+      view(event) {
+        emit("view", event);
       },
 
       remove(event) {

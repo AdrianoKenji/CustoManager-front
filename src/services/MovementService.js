@@ -37,7 +37,7 @@ class MovementService {
         })
     }
 
-    getBrandById(id) {
+    getMovementById(id) {
         return baseURL.get(urlBase + "/get-by-id/" + id, {
             headers: {
                 'Authorization': localStorage.getItem('token')
@@ -47,6 +47,14 @@ class MovementService {
 
     updateMovement(movement) {
         return baseURL.put(urlBase + "/update", movement, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
+    delete(id) {
+        return baseURL.delete(urlBase + "/delete/" + id, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

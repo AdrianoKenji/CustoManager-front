@@ -1,7 +1,8 @@
 <template>
-  <div
+
+ <div
     class="modal fade"
-    id="modalAddMovement"
+    id="modalViewMovement"
     tabindex="-1"
     aria-labelledby="modalAddMovementLabel"
     aria-hidden="true"
@@ -14,7 +15,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modalAddMovementLabel">
-            Cadastrar Movimentação
+            Visualizar Movimentação - {{ movement.id }}
           </h5>
           <button
             type="button"
@@ -24,6 +25,8 @@
           ></button>
         </div>
         <div class="modal-body">
+  
+    
           <div class="row mt-2 mb-2">
             <div class="row col-12 mb-3">
               <div class="form-floating col-4">
@@ -31,6 +34,7 @@
                   name="companies"
                   class="form-select"
                   v-model="movement.idEmpresa"
+                  disabled
                 >
                   <option value="" selected disabled>Selecione:</option>
                   <template v-for="company in companies" :key="company.id">
@@ -45,19 +49,17 @@
               </div>
 
               <div class="form-floating col-4">
-                <select
-                  name="companies"
-                  class="form-select"
-                  v-model="movement.idAssociado"
-                >
-                  <option value="" selected disabled>Selecione:</option>
-                  <template v-for="partner in partners" :key="partner.id">
-                    <option :value="partner.id">
-                      {{ partner.nome }}
-                    </option>
-                  </template>
-                </select>
-                <label for="floatingInputCompanyName" class="ps-3 ms-1"
+                <input
+                  v-if="movement.associado"
+                  type="text"
+                  class="form-control"
+                  id="floatingInputAssociado"
+                  placeholder="Associado"
+                  v-model="movement.associado.nome"
+                  required
+                  disabled
+                />
+                <label for="floatingInputData" class="ps-3 ms-1"
                   >Associado</label
                 >
               </div>
@@ -67,6 +69,7 @@
                   name="companies"
                   class="form-select"
                   v-model="movement.tipoMovimentacao"
+                  disabled
                 >
                   <option value="" selected disabled>Selecione:</option>
                   <option value="COMPRA">Compra</option>
@@ -85,6 +88,7 @@
                   placeholder="Data da movimentação"
                   v-model="movement.dataMovimentacao"
                   required
+                  disabled
                 />
                 <label for="floatingInputData" class="ps-3 ms-1"
                   >Data da movimentação</label
@@ -98,68 +102,13 @@
                   :rows="10"
                   style="height: 58px"
                   v-model="movement.descricao"
+                  disabled
                   placeholder="Descrição"
                 ></textarea>
                 <label for="floatingInput" class="ms-1">Descrição</label>
               </div>
 
               <hr class="mt-3" />
-
-              <div class="form-floating col-4">
-                <select
-                  name="companies"
-                  class="form-select"
-                  v-model="product.id"
-                >
-                  <option value="" selected disabled>Selecione:</option>
-                  <template v-for="prod in products" :key="prod.id">
-                    <option :value="prod.id">
-                      {{ prod.nome }}
-                    </option>
-                  </template>
-                </select>
-                <label for="floatingInputCompanyName" class="ps-3 ms-1"
-                  >Produto</label
-                >
-              </div>
-
-              <div class="form-floating col-3">
-                <input
-                  type="number"
-                  class="form-control"
-                  id="floatingInputQuantidade"
-                  placeholder="Quantidade"
-                  v-model="product.quantidade"
-                  required
-                />
-                <label for="floatingInputQuantidade" class="ps-3 ms-1"
-                  >Quantidade</label
-                >
-              </div>
-
-              <div class="form-floating col-3">
-                <input
-                  type="number"
-                  class="form-control"
-                  id="floatingInputValor"
-                  placeholder="Valor unitário"
-                  v-model="product.valorUnitario"
-                  required
-                />
-                <label for="floatingInputValor" class="ps-3 ms-1"
-                  >Valor unitário</label
-                >
-              </div>
-
-              <div class="col-2">
-                <button
-                  class="btn btn-dark btn-lg rounded-circle"
-                  @click="addProduct()"
-                  :disabled="!canAdd"
-                >
-                  <i class="bx bx-plus fs-4 mt-2"></i>
-                </button>
-              </div>
 
               <div class="col-12 mt-3">
                 <div class="card p-2">
@@ -173,16 +122,11 @@
                         <span v-if="!movimento.produto.oculto">{{
                           movimento.id
                         }}</span>
-                        <span>Nome: {{ movimento.nome + ", " }}</span>
+                        <span>Nome: {{ movimento.produto.nome + ", " }}</span>
                         <br>
                         <span>Qtd: {{ movimento.quantidade + ", " }}</span>
                         <br>
                         <span>Valor: {{ movimento.valorUnitario }}</span>
-                        <br>
-                        <div class="mx-auto">
-                        <button type="button" class="btn btn-danger mx-2 text-center"
-                        @click="movement.movimentacaoProdutos.splice(index,1)">X</button>
-                        </div>
                       </div>
                       </div>
                     </template>
@@ -191,26 +135,10 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer text-end">
-          <button
-            type="button"
-            class="btn btn-secondary btn-sm h-75"
-            data-bs-dismiss="modal"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm h-75"
-            @click="registerMovement()"
-          >
-            Cadastrar
-          </button>
-        </div>
+       </div>
       </div>
     </div>
-  </div>
+   </div>
 
   <ModalMessage
     :title="modalMessage.title"
@@ -221,7 +149,7 @@
     @closeAction="closeAction()"
   />
 </template>
-
+ 
 <script>
 import {
   computed,
@@ -237,12 +165,14 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
+import { routerViewLocationKey, useRoute } from "vue-router";
+
 import PartnerService from "@/services/PartnerService";
 import MovementService from "@/services/MovementService";
 import ProductService from "@/services/ProductService";
 
 export default {
-  name: "ModalAddBrand",
+  name: "EditMovement",
   components: {
     ModalMessage,
   },
@@ -252,15 +182,9 @@ export default {
     const partners = ref([]);
     const products = ref([]);
 
-    const movement = ref({
-      idEmpresa: "",
-      idAssociado: "",
-      tipoMovimentacao: "",
-      dataMovimentacao: "",
-      descricao: "",
-      movimentacaoProdutos: [],
-      valorTotal: 0,
-    });
+    const movement = inject("selectedMovement", {});
+
+    const router = useRoute();
 
     const product = ref({
       id: 0,
@@ -298,93 +222,28 @@ export default {
         modal.show(modalToggle);
       },
 
-      getPartnersByCompanyId() {
-        PartnerService.getPartnerByCompanyId(movement.value.idEmpresa)
+      getMovementById(newValue) {
+        MovementService.getMovementById(newValue)
           .then((response) => {
-            partners.value = response.data;
+            movement.value = response.data; 
+            console.log(response.data)    
+
           })
           .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.errors[0];
-            } else {
-              mensagem = "Ocorreu um erro ao buscar os associados.";
+            if(e.response && e.response.data.errors.length > 0) {
+                let mensagem = "";
+                if (e.response.status == 401) {
+                mensagem = e.response.data.errors[0];
+                } else {
+                mensagem = "Ocorreu um erro ao buscar a movimentação.";
+                }
+
+                methods.openModalMessage("Erro", true, mensagem);
             }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
-          });
-      },
-
-      getProductsByCompanyId() {
-        ProductService.getProductsByCompanyId(
-          movement.value.idEmpresa,
-          "id",
-          false,
-          0,
-          999999
-        )
-          .then((response) => {
-            products.value = response.data.content;
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 401) {
-              mensagem = e.response.data.errors[0];
-            } else {
-              mensagem = "Ocorreu um erro ao buscar os produtos.";
+            else {
+                console.log(e);
             }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
-          });
-      },
-
-      addProduct() {
-        let indexProduct = products.value.findIndex(
-          (x) => x.id == product.value.id
-        );
-
-        movement.value.movimentacaoProdutos.push({
-          produto: {
-            id: product.value.id,
-            oculto: true,
-          },
-          nome: products.value[indexProduct].nome,
-          quantidade: product.value.quantidade,
-          valorUnitario: product.value.valorUnitario,
-        });
-
-        methods.cleanObject();
-      },
-
-      cleanObject() {
-        product.value = {
-          id: 0,
-          quantidade: 0,
-          valorUnitario: 0,
-        };
-      },
-
-      registerMovement() {
-        console.log(movement.value);
-        MovementService.registerMovement(movement.value)
-          .then(() => {
-            methods.openModalMessage(
-              "Sucesso",
-              false,
-              "Movimentação cadastrada com sucesso.",
-              true
-            );
-            methods.closeAction();
-          })
-          .catch((e) => {
-            let mensagem = "";
-            if (e.response.status == 400) {
-              mensagem = e.response.data.errors[0];
-            } else {
-              mensagem = "Ocorreu um erro ao cadastrar movimentação.";
-            }
-
-            methods.openModalMessage("Erro", true, mensagem, false);
+            
           });
       },
 
@@ -426,12 +285,12 @@ export default {
       return canAdd;
     });
 
-    watch(
-      () => movement.value.idEmpresa,
+     watch(
+      () => movement.value.Id,
       (newValue, oldValue) => {
-        if (newValue != oldValue && newValue) {
-          methods.getPartnersByCompanyId();
-          methods.getProductsByCompanyId();
+        console.log(newValue)
+        if (newValue != oldValue && newValue != undefined) {
+          methods.getMovementById(newValue);  
         }
       }
     );
@@ -442,6 +301,7 @@ export default {
       products,
       movement,
       product,
+      router,
       modalMessage,
       ...toRefs(methods),
       canAdd,

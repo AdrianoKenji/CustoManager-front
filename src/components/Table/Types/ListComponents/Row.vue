@@ -22,6 +22,15 @@
         <img src="@/assets/icons/edit-2.svg" alt="Editar" />
       </button>
     </td>
+    <td class="mx-auto" v-if="viewButton">
+      <button
+        type="button"
+        class="btn btn-primary btn-sm h-75 me-1"
+        @click="view(row)"
+      >
+        <img src="@/assets/icons/eye.svg" alt="Visualizar" />
+      </button>
+    </td>
     <td class="mx-auto" v-if="removeButton">
       <button
         type="button"
@@ -64,19 +73,26 @@ export default {
       required: false,
       default: false,
     },
+    viewButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     removeButton: {
       type: Boolean,
       required: false,
       default: false,
     },
   },
-  emits: ["remove", "edit"],
+  emits: ["remove", "edit", "view"],
   setup(props, { emit }) {
     const methods = reactive({
       remove(event) {
         emit("remove", event);
       },
-
+      view(event) {
+        emit("view", event);
+      },
       edit(event) {
         emit("edit", event);
       },
