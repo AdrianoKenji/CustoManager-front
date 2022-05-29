@@ -27,6 +27,7 @@
       :hasPagination="true"
       :editButton="true"
       :removeButton="true"
+      :isAdmin="token.admin"
       @search="search($event)"
       @clean="resetTable()"
       @ordenation="ordenation($event)"

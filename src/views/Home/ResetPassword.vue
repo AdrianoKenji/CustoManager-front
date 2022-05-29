@@ -12,6 +12,7 @@
                   <input
                     type="password"
                     class="form-control"
+                    v-model="password"
                     placeholder="Senha"
                   />
                 </div>
@@ -21,6 +22,7 @@
                   <input
                     type="password"
                     class="form-control"
+                    v-model="confirmPassword"
                     placeholder="Confirmar senha"
                   />
                 </div>
@@ -42,7 +44,21 @@
 </template>
 
 <script>
+import { reactive, ref, toRefs } from "@vue/reactivity";
+
 export default {
   name: "ResetPassword",
+  setup() {
+    const password = ref("");
+    const confirmPassword = ref("");
+
+    const methods = reactive({});
+
+    return {
+      password,
+      confirmPassword,
+      ...toRefs(methods),
+    };
+  },
 };
 </script>

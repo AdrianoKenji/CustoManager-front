@@ -1,6 +1,7 @@
 import baseURL from "@/api"
 
 var urlBase = "/users";
+var emailUrlBase = "/email";
 
 class UserService {
 
@@ -58,6 +59,16 @@ class UserService {
 
     deleteUser(id) {
         return baseURL.delete(urlBase + "/delete/" + id, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
+
+    sendMailToUser(email, token) {
+        return baseURL.get(emailUrlBase + "/send-recovery-password-email" +
+            '?email=' + email +
+            '&token=' + token, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

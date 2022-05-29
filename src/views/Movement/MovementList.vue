@@ -56,6 +56,7 @@
         :hasPagination="true"
         :viewButton="true"
         :removeButton="true"
+        :isAdmin="token.admin"
         @view="view($event)"
         @remove="remove($event)"
         @search="search($event)"

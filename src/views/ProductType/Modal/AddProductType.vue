@@ -53,9 +53,7 @@
                   v-model="productType.nome"
                   required
                 />
-                <label for="floatingInputNome" class="ps-3 ms-1"
-                  >Nome</label
-                >
+                <label for="floatingInputNome" class="ps-3 ms-1">Nome</label>
               </div>
 
               <div class="form-check form-switch col-4 mt-3">
@@ -98,6 +96,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm h-75"
+            :disabled="allFilled"
             @click="registerProductType()"
           >
             Cadastrar
@@ -200,11 +199,33 @@ export default {
       },
     });
 
+    const allFilled = computed(() => {
+      let bloquear = true;
+      let cont = 0;
+
+      if (
+        productType.value.idEmpresa != null &&
+        productType.value.idEmpresa != ""
+      ) {
+        cont++;
+      }
+      if (productType.value.nome != null && productType.value.nome != "") {
+        cont++;
+      }
+
+      if (cont == 2) {
+        bloquear = false;
+      }
+
+      return bloquear;
+    });
+
     return {
       companies,
       productType,
       modalMessage,
       ...toRefs(methods),
+      allFilled,
     };
   },
 };

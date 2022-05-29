@@ -66,6 +66,7 @@
       :hasFilter="true"
       :hasPagination="true"
       :editButton="true"
+      :isAdmin="token.admin"
       @search="search($event)"
       @clean="resetTable()"
       @ordenation="ordenation($event)"

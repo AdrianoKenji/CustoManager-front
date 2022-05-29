@@ -19,6 +19,7 @@
       :hasPagination="true"
       :editButton="true"
       :removeButton="true"
+      :isAdmin="token.admin"
       @search="search($event)"
       @clean="resetTable()"
       @ordenation="ordenation($event)"
@@ -44,14 +45,15 @@
 import { reactive, ref, toRefs } from "@vue/reactivity";
 import { onMounted, provide } from "@vue/runtime-core";
 
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 import Table from "@/components/Table/Table.vue";
 
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
 import ModalEditUser from "./Modal/ModalEditUser.vue";
 
 import UserService from "@/services/UserService";
-
-import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import TokenUtils from "@/utils/TokenUtils";
 
 export default {
   name: "UserList",
@@ -63,6 +65,8 @@ export default {
   setup() {
     const users = ref([]);
     const selectedUser = ref({});
+
+    const token = ref({});
 
     const header = ref([
       {
@@ -145,6 +149,12 @@ export default {
     });
 
     const methods = reactive({
+      getTokenAndDecode() {
+        token.value = TokenUtils.getTokenAndDecodeToJson(
+          localStorage.getItem("token")
+        );
+      },
+
       openModalMessage(title, isError, message, needsRefresh) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
@@ -333,6 +343,7 @@ export default {
     });
 
     onMounted(() => {
+      methods.getTokenAndDecode();
       methods.getAllUsers();
     });
 
@@ -341,6 +352,7 @@ export default {
     return {
       users,
       selectedUser,
+      token,
       header,
       offset,
       limit,

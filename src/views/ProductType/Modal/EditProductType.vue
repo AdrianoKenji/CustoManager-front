@@ -92,6 +92,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm h-75"
+            :disabled="allFilled"
             @click="updateProductType()"
           >
             Atualizar
@@ -198,6 +199,30 @@ export default {
       },
     });
 
+    const allFilled = computed(() => {
+      let bloquear = true;
+      let cont = 0;
+
+      if (
+        selectedProductType.value.IdEmpresa != null &&
+        selectedProductType.value.IdEmpresa != ""
+      ) {
+        cont++;
+      }
+      if (
+        selectedProductType.value.Nome != null &&
+        selectedProductType.value.Nome != ""
+      ) {
+        cont++;
+      }
+
+      if (cont == 2) {
+        bloquear = false;
+      }
+
+      return bloquear;
+    });
+
     watch(
       () => selectedProductType.value,
       (newValue, oldValue) => {
@@ -217,6 +242,7 @@ export default {
       selectedProductType,
       modalMessage,
       ...toRefs(methods),
+      allFilled,
     };
   },
 };

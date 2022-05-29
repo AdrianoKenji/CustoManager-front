@@ -1,14 +1,14 @@
 <template>
-  <component :is="layout">
+  <component :is="layout" style="max-width: 1500px">
     <slot />
   </component>
 </template>
 
 <script>
 import { shallowRef } from "@vue/reactivity";
-
 import { useRoute } from "vue-router";
 import { watch } from "@vue/runtime-core";
+
 export default {
   name: "AppLayout",
   setup() {
@@ -26,7 +26,7 @@ export default {
         }
       }
     );
-    
+
     return { layout };
   },
 };

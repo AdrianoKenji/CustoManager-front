@@ -13,6 +13,7 @@
       :editButton="editButton"
       :viewButton="viewButton"
       :removeButton="removeButton"
+      :isAdmin="isAdmin"
       @view="view($event)"
       @edit="edit($event)"
       @remove="remove($event)"
@@ -97,6 +98,11 @@ export default {
       default: false,
     },
     removeButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isAdmin: {
       type: Boolean,
       required: false,
       default: false,

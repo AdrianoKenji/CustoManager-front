@@ -9,9 +9,12 @@
   <div class="row d-flex justify-content-center mt-4">
     <div class="row col-10">
       <div class="form-floating col-4 mb-4 float-start">
-        <select name="companies" class="form-select"
-         v-model="selectedCompany"
-         :disabled="!isCompanySelected">
+        <select
+          name="companies"
+          class="form-select"
+          v-model="selectedCompany"
+          :disabled="!isCompanySelected"
+        >
           <option value="" selected disabled>Selecione:</option>
           <template v-for="company in companies" :key="company.id">
             <option :value="company.id">
@@ -34,9 +37,11 @@
 
     <div class="row col-10">
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" 
-        v-model="selectedType"
-        :disabled="isCompanySelected">
+        <select
+          class="form-select"
+          v-model="selectedType"
+          :disabled="isCompanySelected"
+        >
           <option value="" selected disabled>Selecione:</option>
           <template v-for="type in types" :key="type.id">
             <option :value="type">
@@ -48,9 +53,11 @@
       </div>
 
       <div class="form-floating col-6 mb-4">
-        <select class="form-select" 
-        v-model="selectedBrand"
-        :disabled="isCompanySelected">
+        <select
+          class="form-select"
+          v-model="selectedBrand"
+          :disabled="isCompanySelected"
+        >
           <option value="" selected disabled>Selecione:</option>
           <template v-for="brand in brands" :key="brand.id">
             <option :value="brand">
@@ -91,7 +98,13 @@
   </div>
 
   <div class="text-end col-11">
-    <button class="btn btn-success me-2" @click="insertProduto()">Criar</button>
+    <button
+      class="btn btn-success me-2"
+      :disabled="allFilled"
+      @click="insertProduto()"
+    >
+      Criar
+    </button>
   </div>
 
   <ModalMessage
@@ -143,12 +156,12 @@ export default {
 
     const loading = ref(false);
 
-    const isCompanySelected = computed(() => {     
-     let notSelected = false;
+    const isCompanySelected = computed(() => {
+      let notSelected = false;
 
-     if(brands.value.length == 0 && types.value.length == 0) {
-       notSelected = true;
-     }
+      if (brands.value.length == 0 && types.value.length == 0) {
+        notSelected = true;
+      }
       return notSelected;
     });
 
@@ -176,7 +189,6 @@ export default {
           localStorage.getItem("token")
         );
       },
-
 
       openModalMessage(title, isError, message, needsRefresh) {
         modalMessage.value.title = title;
@@ -327,6 +339,37 @@ export default {
       }
     });
 
+    const allFilled = computed(() => {
+      let bloquear = true;
+      let cont = 0;
+
+      if (selectedCompany.value != null && selectedCompany.value != "") {
+        cont++;
+      }
+      if (selectedBrand.value.id != null && selectedBrand.value.id != "") {
+        cont++;
+      }
+      if (selectedType.value.id != null && selectedType.value.id != "") {
+        cont++;
+      }
+      if (product.value.name != null && product.value.name != "") {
+        cont++;
+      }
+      if (
+        product.value.value != null &&
+        product.value.value != "" &&
+        product.value.value > 0
+      ) {
+        cont++;
+      }
+
+      if (cont == 5) {
+        bloquear = false;
+      }
+
+      return bloquear;
+    });
+
     return {
       product,
       token,
@@ -345,6 +388,7 @@ export default {
       loading,
       isCompanySelected,
       ...toRefs(methods),
+      allFilled,
     };
   },
 };

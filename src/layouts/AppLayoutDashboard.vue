@@ -2,7 +2,7 @@
   <div id="wrapper">
     <HeaderLayout />
 
-    <div id="page-content-wrapper" style="min-height: 83vh">
+    <div id="page-content-wrapper">
       <div class="container-xxl">
         <div class="row">
           <div>

@@ -5,7 +5,11 @@
         <thead class="bg bg-dark mt-1">
           <tr>
             <template v-for="(column, index) in columns" :key="index">
-              <th class="text-center text-white" v-if="!column.hidden" style="max-width: 150px; min-width: 150px">
+              <th
+                class="text-center text-white"
+                v-if="!column.hidden"
+                style="max-width: 150px; min-width: 150px"
+              >
                 <div class="d-flex justify-content-evenly">
                   <div class="col-10 text-truncate text-start ps-2">
                     {{ column.name }}
@@ -49,6 +53,7 @@
               :viewButton="viewButton"
               :editButton="editButton"
               :removeButton="removeButton"
+              :isAdmin="isAdmin"
               @edit="edit($event)"
               @view="view($event)"
               @remove="remove($event)"
@@ -116,6 +121,11 @@ export default {
       default: false,
     },
     removeButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isAdmin: {
       type: Boolean,
       required: false,
       default: false,

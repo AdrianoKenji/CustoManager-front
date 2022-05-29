@@ -17,6 +17,7 @@
       <button
         type="button"
         class="btn btn-warning btn-sm h-75 me-1"
+        :disabled="isAdmin ? false : true"
         @click="edit(row)"
       >
         <img src="@/assets/icons/edit-2.svg" alt="Editar" />
@@ -35,6 +36,7 @@
       <button
         type="button"
         class="btn btn-danger btn-sm h-75 me-1"
+        :disabled="isAdmin ? false : true"
         @click="remove(row)"
       >
         <img src="@/assets/icons/trash-2.svg" alt="Excluir" />
@@ -79,6 +81,11 @@ export default {
       default: false,
     },
     removeButton: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isAdmin: {
       type: Boolean,
       required: false,
       default: false,

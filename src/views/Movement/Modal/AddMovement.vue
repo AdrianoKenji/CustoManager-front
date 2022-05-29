@@ -203,6 +203,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm h-75"
+            :disabled="allFilled"
             @click="registerMovement()"
           >
             Cadastrar
@@ -436,6 +437,42 @@ export default {
       }
     );
 
+    const allFilled = computed(() => {
+      let bloquear = true;
+      let cont = 0;
+
+      if (movement.value.idEmpresa != null && movement.value.idEmpresa != "") {
+        cont++;
+      }
+      if (
+        movement.value.idAssociado != null &&
+        movement.value.idAssociado != ""
+      ) {
+        cont++;
+      }
+      if (
+        movement.value.tipoMovimentacao != null &&
+        movement.value.tipoMovimentacao != ""
+      ) {
+        cont++;
+      }
+      if (
+        movement.value.dataMovimentacao != null &&
+        movement.value.dataMovimentacao != ""
+      ) {
+        cont++;
+      }
+      if (movement.value.movimentacaoProdutos.length > 0) {
+        cont++;
+      }
+
+      if (cont == 5) {
+        bloquear = false;
+      }
+
+      return bloquear;
+    });
+
     return {
       companies,
       partners,
@@ -445,6 +482,7 @@ export default {
       modalMessage,
       ...toRefs(methods),
       canAdd,
+      allFilled,
     };
   },
 };

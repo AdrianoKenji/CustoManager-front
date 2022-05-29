@@ -1,5 +1,8 @@
 <template>
-  <div class="sidebar">
+  <div
+    class="sidebar"
+    style="min-height: 94vh"
+  >
     <div class="logo-details">
       <i class="bx bxs-cog icon me-1"></i>
       <div class="logo_name">CustoManager</div>
