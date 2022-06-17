@@ -110,7 +110,7 @@ export default {
         value: true,
         order: true,
         type: "text",
-        filter: "filterCpf",
+        filter: "filterTelephone",
       },
       {
         id: 5,
@@ -119,7 +119,7 @@ export default {
         value: true,
         order: true,
         type: "text",
-        filter: "filterTelephone",
+        filter: "filterEndereco",
       },
       {
         name: "Ações",
@@ -269,9 +269,9 @@ export default {
           companies.value.push({
             Id: x.id,
             Nome: x.nome,
-            CNPJ: x.cnpj,
-            Endereco: x.endereco,
+            CNPJ: x.cnpj,            
             Telefone: x.telefone,
+            Endereco: x.endereco,
           });
         });
       },
