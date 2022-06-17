@@ -145,8 +145,8 @@ export default {
             false
           );
         }
-
-        console.log(user.value)
+                
+        user.value.senha = newPassword.value;
 
         UserService.changePassword(user.value, oldPassword.value)
           .then(() => {
