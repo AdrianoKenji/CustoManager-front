@@ -67,8 +67,10 @@
               </div>
             </div>
           </div>
-
+        
+        <form>
           <div class="row mt-4 ms-1 me-1" v-if="step == 0">
+            
             <div class="form-floating col-12 mb-4">
               <input
                 type="text"
@@ -77,6 +79,8 @@
                 placeholder="Nome completo"
                 v-model="user.nome"
                 required
+                maxlength="100"                
+                v-on:keypress="isLetter($event)"
               />
               <label for="floatingInputConfirmPassword" class="ps-3 ms-1"
                 >Nome completo</label
@@ -90,12 +94,18 @@
                 id="floatingInputConfirmPassword"
                 placeholder="E-mail"
                 v-model="user.login"
+                maxlength="100"
                 required
+                @change="validateEmail"
               />
               <label for="floatingInputConfirmPassword" class="ps-3 ms-1"
                 >E-mail</label
               >
-            </div>
+              <span 
+                    style="color:white; font-size:70%" 
+                    class="floating-placeholder">{{ msg }}</span>
+            </div>            
+            
 
             <div class="form-floating col-4 mb-4">
               <input
@@ -135,6 +145,7 @@
                 placeholder="Endereço"
                 v-model="user.endereco"
                 required
+                maxlength="200"    
               />
               <label for="floatingInputConfirmPassword" class="ps-3 ms-1"
                 >Endereço</label
@@ -154,7 +165,8 @@
                 >Data de nascimento</label
               >
             </div>
-          </div>
+          </div>          
+        </form>
 
           <div class="row mt-4 ms-1 me-1" v-if="step == 1">
             <div class="form-floating col-12 mb-4">
@@ -165,6 +177,7 @@
                 placeholder="Senha"
                 v-model="user.senha"
                 required
+                maxlength="100" 
               />
               <label for="floatingInputPassword" class="ps-3 ms-1">Senha</label>
             </div>
@@ -177,6 +190,7 @@
                 placeholder="Confirmar senha"
                 v-model="confirmPassword"
                 required
+                maxlength="100" 
               />
               <label for="floatingInputConfirmPassword" class="ps-3 ms-1"
                 >Confirmar senha</label
@@ -306,8 +320,9 @@
     :title="modalMessage.title"
     :isError="modalMessage.isError"
     :message="modalMessage.message"
-    :redirect="'/'"
     :reference="modalMessage.reference"
+    :redirect="modalMessage.redirect"
+    :needsRefresh="modalMessage.needsRefresh"
   />
 </template>
 
@@ -339,19 +354,25 @@ export default {
     const confirmPassword = ref("");
 
     const step = ref(0);
+    const msg = ref("");
+    const validated = ref(0);
 
     const modalMessage = ref({
       title: "",
       isError: false,
       message: "",
       reference: "Register",
+      needsRefresh: false,
+      redirect: "",
     });
 
     const methods = reactive({
-      openModalMessage(title, isError, message) {
+      openModalMessage(title, isError, message, needsRefresh, redirect) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
         modalMessage.value.message = message;
+        modalMessage.value.needsRefresh = needsRefresh;
+        modalMessage.value.redirect = redirect;
 
         var modal = new bootstrap.Modal(
           document.getElementById(
@@ -380,12 +401,29 @@ export default {
       verifyPassword(password, confirmPassword) {
         if (password && confirmPassword) {
           if (password != confirmPassword) {
-            methods.openModalMessage("Erro", true, "As senhas não coincidem.");
+            methods.openModalMessage("Erro", true, "As senhas não coincidem.", false, '/cadastrar');
           } else {
             methods.nextPage(step.value);
           }
         }
       },
+
+      validateEmail() {        
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(user.value.login)) {
+            msg.value = '';
+            validated.value = true;
+           
+        } else {
+            msg.value = 'Digite um e-mail válido';
+            validated.value = false;
+        }
+      },
+
+      isLetter(e) {
+      let char = String.fromCharCode(e.keyCode); 
+      if(/^[A-Za-z ]+$/.test(char)) return true; 
+      else e.preventDefault(); 
+    },
 
       register() {
         UserService.register(user.value)
@@ -393,7 +431,9 @@ export default {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "Você foi registrado com sucesso."
+              "Você foi registrado com sucesso.",
+              true,
+              '/'
             );
           })
           .catch((e) => {
@@ -405,7 +445,7 @@ export default {
               mensagem = "Ocorreu um erro durante o seu cadastro.";
             }
 
-            methods.openModalMessage("Erro", true, mensagem);
+            methods.openModalMessage("Erro", true, mensagem, false, '/cadastrar');
           });
       },
     });
@@ -418,7 +458,7 @@ export default {
         if (user.value.nome != null && user.value.nome != "") {
           cont++;
         }
-        if (user.value.login != null && user.value.login != "") {
+        if (user.value.login != null && user.value.login != "" && validated.value == true) {
           cont++;
         }
         if (user.value.cpf != null && user.value.cpf != "") {
@@ -472,6 +512,8 @@ export default {
       modalMessage,
       nextStepPassword,
       nextStepConfirmation,
+      msg,
+      validated,
       ...toRefs(methods),
     };
   },

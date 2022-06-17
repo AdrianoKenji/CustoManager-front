@@ -30,6 +30,7 @@
           class="form-control"
           id="floatingInputRazaoSocial"
           placeholder="RazaoSocial"
+          maxlength="100" 
           v-model="company.nome"
           required
         />
@@ -69,6 +70,7 @@
           class="form-control"
           id="floatingInputEndereco"
           placeholder="Endereço"
+          maxlength="200" 
           v-model="company.endereco"
           required
         />
@@ -790,7 +792,7 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem =
