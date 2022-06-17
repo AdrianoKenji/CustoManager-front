@@ -433,7 +433,7 @@ export default {
               false,
               "Você foi registrado com sucesso.",
               true,
-              "/"
+              '/'
             );
           })
           .catch((e) => {

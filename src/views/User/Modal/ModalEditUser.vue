@@ -38,6 +38,8 @@
                   placeholder="Nome"
                   v-model="user.nome"
                   required
+                  maxlength="100"                
+                  v-on:keypress="isLetter($event)"
                 />
                 <label for="floatingInputNome" class="ps-3 ms-1">Nome</label>
               </div>
@@ -50,8 +52,13 @@
                   placeholder="Email"
                   v-model="user.login"
                   required
+                  maxlength="100"
+                  @change="validateEmail"
                 />
                 <label for="floatingInputEmail" class="ps-3 ms-1">Email</label>
+                <span 
+                    style="color:red; font-size:70%" 
+                    class="floating-placeholder">{{ msg }}</span>
               </div>
 
               <div class="form-floating col-4 mb-3">
@@ -103,6 +110,7 @@
                   placeholder="Endereço"
                   v-model="user.endereco"
                   required
+                  maxlength="200"  
                 />
                 <label for="floatingInputEndereco" class="ps-3 ms-1"
                   >Endereço</label
@@ -151,6 +159,7 @@
           <button
             type="button"
             class="btn btn-success btn-sm h-75"
+            :disabled="validated ? false : true"
             @click="updateUser()"
           >
             Salvar
@@ -166,6 +175,7 @@
     :message="modalMessage.message"
     :reference="modalMessage.reference"
     :needsRefresh="modalMessage.needsRefresh"
+    :redirect="modalMessage.redirect"
     @closeAction="closeAction()"
   />
 </template>
@@ -188,6 +198,9 @@ export default {
     const selectedUser = inject("selectedUser", {});
 
     const user = ref({});
+    
+    const msg = ref("");
+    const validated = ref(1);
 
     const modalMessage = ref({
       title: "",
@@ -195,14 +208,16 @@ export default {
       message: "",
       reference: "ModalEditUser",
       needsRefresh: false,
+      redirect: "",
     });
 
     const methods = reactive({
-      openModalMessage(title, isError, message, needsRefresh) {
+      openModalMessage(title, isError, message, needsRefresh, redirect) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
         modalMessage.value.message = message;
         modalMessage.value.needsRefresh = needsRefresh;
+        modalMessage.value.redirect = redirect;
 
         var modal = new bootstrap.Modal(
           document.getElementById(
@@ -236,6 +251,23 @@ export default {
           });
       },
 
+      validateEmail() {        
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(user.value.login)) {
+            msg.value = '';
+            validated.value = true;
+           
+        } else {
+            msg.value = 'Digite um e-mail válido';
+            validated.value = false;
+        }
+      },
+
+      isLetter(e) {
+      let char = String.fromCharCode(e.keyCode); 
+      if(/^[A-Za-z ]+$/.test(char)) return true; 
+      else e.preventDefault(); 
+    },
+
       updateUser() {
         UserService.updateUser(user.value)
           .then(() => {
@@ -244,7 +276,9 @@ export default {
               false,
               "O usuário " +
                 selectedUser.value.Nome +
-                " foi atualizado com sucesso."
+                " foi atualizado com sucesso.",
+                true,
+                '/usuarios'
             );
             methods.closeAction();
           })
@@ -281,6 +315,8 @@ export default {
       selectedUser,
       user,
       modalMessage,
+      msg,
+      validated,
       ...toRefs(methods),
     };
   },
