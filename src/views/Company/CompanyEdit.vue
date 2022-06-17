@@ -167,6 +167,7 @@
       :hasFilter="false"
       :hasPagination="false"
       :removeButton="true"
+      :isAdmin="token.admin"
       @remove="removeEmployee($event)"
     />
   </div>
@@ -268,6 +269,7 @@
           type="text"
           class="form-control"
           id="floatingInputNome"
+          maxlength="100"
           :placeholder="
             partner.pessoa == 'PESSOA_FISICA' || !partner.pessoa
               ? 'Nome'
@@ -302,6 +304,7 @@
         class="form-control"
         id="floatingInputEndereco"
         placeholder="Endereço"
+        maxlength="200"
         v-model="partner.endereco"
         required
       />
@@ -325,6 +328,7 @@
       :hasFilter="false"
       :hasPagination="false"
       :removeButton="true"
+      :isAdmin="token.admin"
       :editButton="true"
       @edit="editPartner($event)"
       @remove="removePartner($event)"
@@ -458,13 +462,6 @@ export default {
         order: false,
       },
       {
-        id: 7,
-        name: "Status",
-        key: "status",
-        value: false,
-        order: false,
-      },
-      {
         name: "Ações",
         value: false,
         order: false,
@@ -594,7 +591,7 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao buscar a empresa.";
@@ -656,7 +653,6 @@ export default {
             Telefone: x.usuarioFuncionario.telefone,
             Endereco: x.usuarioFuncionario.endereco,
             adminEmpresarial: x.adminEmpresarial,
-            status: x.status,
           });
         });
       },
@@ -718,7 +714,7 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao inserir Funcionário.";
@@ -827,7 +823,7 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.message;
             } else {
               mensagem =
@@ -856,7 +852,7 @@ export default {
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.message;
             } else {
               mensagem =
