@@ -401,7 +401,7 @@ export default {
       verifyPassword(password, confirmPassword) {
         if (password && confirmPassword) {
           if (password != confirmPassword) {
-            methods.openModalMessage("Erro", true, "As senhas não coincidem.");
+            methods.openModalMessage("Erro", true, "As senhas não coincidem.", false, '/cadastrar');
           } else {
             methods.nextPage(step.value);
           }

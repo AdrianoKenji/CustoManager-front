@@ -14,6 +14,7 @@
           class="form-control"
           id="floatingInputCompanyName"
           placeholder="Razão social"
+          maxlength="100"     
           v-model="company.nome"
           required
         />
@@ -43,6 +44,7 @@
           class="form-control"
           id="floatingInputAddress"
           placeholder="Endereço"
+          maxlength="200"     
           v-model="company.endereco"
           required
         />
@@ -73,7 +75,7 @@
     :isError="modalMessage.isError"
     :message="modalMessage.message"
     :reference="modalMessage.reference"
-    :redirect="'/empresas'"
+    :redirect="modalMessage.redirect"
   />
 </template>
 
@@ -106,13 +108,15 @@ export default {
       isError: false,
       message: "",
       reference: "AddCompany",
+      redirect: '/criar-empresa'
     });
 
     const methods = reactive({
-      openModalMessage(title, isError, message) {
+      openModalMessage(title, isError, message, redirect) {
         modalMessage.value.title = title;
         modalMessage.value.isError = isError;
         modalMessage.value.message = message;
+        modalMessage.value.redirect = redirect;
 
         var modal = new bootstrap.Modal(
           document.getElementById(
@@ -147,18 +151,19 @@ export default {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "Empresa criada com sucesso."
+              "Empresa criada com sucesso.",
+              '/empresas'
             );
           })
           .catch((e) => {
             let mensagem = "";
             if (e.response.status == 400) {
-              mensagem = e.response.data.message;
+              mensagem = e.response.data.errors[0];
             } else {
               mensagem = "Ocorreu um erro ao cadastrar Empresa.";
             }
 
-            methods.openModalMessage("Erro", true, mensagem);
+            methods.openModalMessage("Erro", true, mensagem, '/criar-empresa');
           });
       },
 
