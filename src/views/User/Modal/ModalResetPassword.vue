@@ -64,6 +64,7 @@
           <button
             type="button"
             class="btn btn-primary btn-sm h-75"
+            :disabled="allFilled"
             @click="changePassword()"
           >
             Redefinir
@@ -91,7 +92,7 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
 import UserService from "@/services/UserService";
-import { inject } from '@vue/runtime-core';
+import { computed, inject } from "@vue/runtime-core";
 
 export default {
   name: "ModalResetPassword",
@@ -136,32 +137,51 @@ export default {
       },
 
       changePassword() {
-        console.log(oldPassword.value);
-        console.log(newPassword.value);
-        console.log(confirmPassword.value);
-      },
+        if (newPassword.value != confirmPassword.value) {
+          methods.openModalMessage(
+            "Erro",
+            true,
+            "As senhas não coincidem.",
+            false
+          );
+        }
 
-      /*  sendMailToUser() {
-        UserService.sendMailToUser(email.value, localStorage.getItem("token"))
+        console.log(user.value)
+
+        UserService.changePassword(user.value, oldPassword.value)
           .then(() => {
             methods.openModalMessage(
               "Sucesso",
               false,
-              "Email enviado com sucesso.",
+              "Senha redefinida com sucesso.",
               false
             );
           })
           .catch((e) => {
             let mensagem = "";
-            if (e.response.status == 401) {
+            if (e.response.status == 400) {
               mensagem = e.response.data.errors[0];
             } else {
-              mensagem = "Ocorreu um erro ao enviar o email";
+              mensagem = "Ocorreu um erro ao redefinir a senha.";
             }
 
             methods.openModalMessage("Erro", true, mensagem, false);
           });
-      }, */
+      },
+    });
+
+    const allFilled = computed(() => {
+      let blocked = true;
+
+      if (
+        oldPassword.value != "" &&
+        newPassword != "" &&
+        confirmPassword != ""
+      ) {
+        blocked = false;
+      }
+
+      return blocked;
     });
 
     return {
@@ -171,6 +191,7 @@ export default {
       confirmPassword,
       modalMessage,
       ...toRefs(methods),
+      allFilled,
     };
   },
 };

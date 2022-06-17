@@ -63,6 +63,14 @@ class MovementService {
             }
         })
     }
+
+    getMovementQuantityByCompanyId(id) {
+        return baseURL.get(urlBase + "/get-quantidade-by-tipo/" + id, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
 }
 
 export default new MovementService();

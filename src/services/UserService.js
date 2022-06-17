@@ -74,6 +74,14 @@ class UserService {
             }
         })
     }
+
+    changePassword(user, oldPassword) {
+        return baseURL.put(urlBase + "/change-password" + '?senhaInformada=' + oldPassword, user, {
+            headers: {
+                'Authorization': localStorage.getItem('token')
+            }
+        })
+    }
 }
 
 export default new UserService();

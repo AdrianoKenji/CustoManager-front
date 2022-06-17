@@ -70,18 +70,12 @@
                           <div class="col-3">
                             <div class="card">
                               <h6 class="mt-2">Total movimentações</h6>
-                              <div v-if="company.movimentacoes.length > 0">
-                                <template
-                                  v-for="(
-                                    movimentacao, index
-                                  ) in company.movimentacoes"
-                                  :key="index"
-                                >
-                                </template>
-                              </div>
-                              <div v-else>
-                                <span> Nenhuma movimentação cadastrada. </span>
-                              </div>
+                              <span>
+                                Compra: {{ company.movimentacao.qt_compra }}
+                              </span>
+                              <span>
+                                Venda: {{ company.movimentacao.qt_venda }}
+                              </span>
                             </div>
                           </div>
                           <div class="col-3">
@@ -159,6 +153,7 @@ import ModalMessage from "@/components/Modal/ModalMessage.vue";
 import TokenUtils from "@/utils/TokenUtils";
 import CompanyService from "@/services/CompanyService";
 import ProductService from "@/services/ProductService";
+import MovementService from "@/services/MovementService";
 
 export default {
   name: "Dashboard",
@@ -235,8 +230,13 @@ export default {
 
             companies.value.map((x) => {
               x.produtos = [];
-              x.movimentacoes = [];
+              x.movimentacao = {
+                qt_venda: 0,
+                qt_compra: 0,
+              };
+
               methods.getProductsByCompanyId(x.id);
+              methods.getMovementQuantityByCompanyId(x.id);
             });
           })
           .catch((e) => {
@@ -267,6 +267,33 @@ export default {
             } else {
               mensagem =
                 "Ocorreu um erro ao obter os Produtos da empresa do usuário";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
+      },
+
+      getMovementQuantityByCompanyId(companyId) {
+        MovementService.getMovementQuantityByCompanyId(companyId)
+          .then((response) => {
+            let indexCompany = companies.value.findIndex(
+              (x) => x.id == companyId
+            );
+
+            console.log(response.data);
+
+            companies.value[indexCompany].movimentacao.qt_compra =
+              response.data.qt_compra;
+            companies.value[indexCompany].movimentacao.qt_venda =
+              response.data.qt_venda;
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 400) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem =
+                "Ocorreu um erro ao obter o total das Movimentações da empresa do usuário";
             }
 
             methods.openModalMessage("Erro", true, mensagem, false);
