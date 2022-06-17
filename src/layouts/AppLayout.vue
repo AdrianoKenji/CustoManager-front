@@ -1,5 +1,5 @@
 <template>
-  <component :is="layout" style="max-width: 1500px">
+  <component :is="layout">
     <slot />
   </component>
 </template>

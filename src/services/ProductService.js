@@ -14,11 +14,11 @@ class ProductService {
 
     getProductsByCompanyId(id, orderBy = "id", orderAsc = false, offset = 0, limit = 0) {
         return baseURL.get(urlBase + "/get-produtos-by-empresa-id" +
-        '?idEmpresa=' + id +
-        '&orderBy=' + orderBy +
-        '&orderAsc=' + orderAsc + 
-        '&pageNumber=' + offset +
-        '&pageSize=' + limit, {
+            '?idEmpresa=' + id +
+            '&orderBy=' + orderBy +
+            '&orderAsc=' + orderAsc +
+            '&pageNumber=' + offset +
+            '&pageSize=' + limit, {
             headers: {
                 'Authorization': localStorage.getItem('token')
             }

@@ -14,6 +14,130 @@
         <span class="fs-4 me-5">{{ messageDate }}</span>
       </div>
     </div>
+
+    <div class="d-flex justify-content-center">
+      <div class="col-12 row mt-3">
+        <div class="card">
+          <div class="text-start">
+            <h4 class="mt-2">Minhas empresas</h4>
+            <hr style="margin-top: -5px" />
+          </div>
+
+          <div
+            class="d-flex justify-content-center"
+            v-if="companies.length > 0"
+          >
+            <div class="col-11 row">
+              <template v-for="(company, index) in companies" :key="index">
+                <div class="accordion" id="accordionExample">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                      <button
+                        class="accordion-button"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne"
+                        aria-expanded="true"
+                        aria-controls="collapseOne"
+                      >
+                        {{ company.nome }}
+                      </button>
+                    </h2>
+                    <div
+                      id="collapseOne"
+                      class="accordion-collapse collapse show"
+                      aria-labelledby="headingOne"
+                      data-bs-parent="#accordionExample"
+                    >
+                      <div class="accordion-body">
+                        <div class="col-12 row">
+                          <div class="col-3">
+                            <div class="card">
+                              <h6 class="mt-2">Lista de Produtos</h6>
+                              <div v-if="company.produtos.length > 0">
+                                <template
+                                  v-for="(produto, index) in company.produtos"
+                                  :key="index"
+                                >
+                                  <span> {{ produto.nome }} </span><br />
+                                </template>
+                              </div>
+                              <div v-else>
+                                <span> Nenhum produto cadastrado. </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-3">
+                            <div class="card">
+                              <h6 class="mt-2">Total movimentações</h6>
+                              <div v-if="company.movimentacoes.length > 0">
+                                <template
+                                  v-for="(
+                                    movimentacao, index
+                                  ) in company.movimentacoes"
+                                  :key="index"
+                                >
+                                </template>
+                              </div>
+                              <div v-else>
+                                <span> Nenhuma movimentação cadastrada. </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-3">
+                            <div class="card">
+                              <h6 class="mt-2">Lista de Funcionários</h6>
+                              <div v-if="company.vinculos.length > 0">
+                                <template
+                                  v-for="(
+                                    funcionario, index
+                                  ) in company.vinculos"
+                                  :key="index"
+                                >
+                                  <span>
+                                    {{
+                                      funcionario.usuarioFuncionario.nome
+                                    }} </span
+                                  ><br />
+                                </template>
+                              </div>
+                              <div v-else>
+                                <span> Nenhum funcionário cadastrado. </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-3">
+                            <div class="card">
+                              <h6 class="mt-2">Lista de Associados</h6>
+                              <div v-if="company.associado.length > 0">
+                                <template
+                                  v-for="(
+                                    associado, index
+                                  ) in company.associado"
+                                  :key="index"
+                                >
+                                  <span> {{ associado.nome }} </span><br />
+                                </template>
+                              </div>
+                              <div v-else>
+                                <span> Nenhum associado cadastrado. </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="col-12 mb-2" v-else>
+            <h4>Você não possui empresas cadastradas.</h4>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <ModalMessage
@@ -33,6 +157,8 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import ModalMessage from "@/components/Modal/ModalMessage.vue";
 
 import TokenUtils from "@/utils/TokenUtils";
+import CompanyService from "@/services/CompanyService";
+import ProductService from "@/services/ProductService";
 
 export default {
   name: "Dashboard",
@@ -41,6 +167,8 @@ export default {
   },
   setup() {
     const nome = ref("");
+
+    const companies = ref([]);
 
     const token = ref({});
 
@@ -99,6 +227,51 @@ export default {
         messageDate.value =
           days.value[date.getDay()] + ", " + str_data + " às " + str_hora;
       },
+
+      getCompanyByUserId() {
+        CompanyService.getCompaniesByUserId(token.value.id)
+          .then((response) => {
+            companies.value = response.data;
+
+            companies.value.map((x) => {
+              x.produtos = [];
+              x.movimentacoes = [];
+              methods.getProductsByCompanyId(x.id);
+            });
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 400) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem = "Ocorreu um erro ao obter as Empresas do usuário.";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
+      },
+
+      getProductsByCompanyId(companyId) {
+        ProductService.getProductsByCompanyId(companyId, "id", false, 0, 10)
+          .then((response) => {
+            let indexCompany = companies.value.findIndex(
+              (x) => x.id == companyId
+            );
+
+            companies.value[indexCompany].produtos = response.data.content;
+          })
+          .catch((e) => {
+            let mensagem = "";
+            if (e.response.status == 400) {
+              mensagem = e.response.data.errors[0];
+            } else {
+              mensagem =
+                "Ocorreu um erro ao obter os Produtos da empresa do usuário";
+            }
+
+            methods.openModalMessage("Erro", true, mensagem, false);
+          });
+      },
     });
 
     onMounted(() => {
@@ -107,10 +280,12 @@ export default {
       );
 
       methods.getDateAndHour();
+      methods.getCompanyByUserId();
     });
 
     return {
       nome,
+      companies,
       token,
       days,
       messageDate,

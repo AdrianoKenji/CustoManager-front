@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="sidebar"
-    style="min-height: 94vh"
-  >
+  <div class="sidebar" style="min-height: 94vh">
     <div class="logo-details">
       <i class="bx bxs-cog icon me-1"></i>
       <div class="logo_name">CustoManager</div>
@@ -88,7 +85,7 @@
       </li> -->
       <li class="profile">
         <div class="profile-details">
-          <img src="../assets/img/undraw_male_avatar.svg" alt="profileImg" />
+          <img src="../assets/img/undraw_male_avatar.svg" alt="Imagem do Perfil" />
           <div class="name_job">
             <router-link to="/meu-perfil" class="router">
               <div class="name">{{ token.nome }}</div>
@@ -196,8 +193,12 @@ export default {
   transition: all 0.5s ease;
 }
 
+#wrapper.toggled {
+  padding-left: 170px;
+}
+
 #wrapper.toggled #page-content-wrapper {
-  margin-left: 240px;
+  margin-right: -250px;
   transition: all 0.5s ease;
 }
 </style>
